@@ -75,6 +75,8 @@ public class DozeParameters implements
     public static final boolean FORCE_BLANKING =
             SystemProperties.getBoolean("debug.force_blanking", false);
 
+    private static DozeParameters sInstance;
+
     private final AmbientDisplayConfiguration mAmbientDisplayConfiguration;
     private final PowerManager mPowerManager;
 
@@ -168,11 +170,17 @@ public class DozeParameters implements
                     dispatchAlwaysOnEvent();
                 }
             });
+
+        sInstance = this;
     }
 
     private void updateQuickPickupEnabled() {
         mIsQuickPickupEnabled =
                 mAmbientDisplayConfiguration.quickPickupSensorEnabled(mUserTracker.getUserId());
+    }
+
+    public static DozeParameters getInstance(Context context) {
+        return sInstance;
     }
 
     public boolean getDisplayStateSupported() {

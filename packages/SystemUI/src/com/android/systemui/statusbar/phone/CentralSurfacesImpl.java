@@ -132,6 +132,7 @@ import com.android.systemui.EventLogTags;
 import com.android.systemui.InitController;
 import com.android.systemui.Prefs;
 import com.android.systemui.accessibility.floatingmenu.AccessibilityFloatingMenuController;
+import com.android.systemui.ambientmusic.AmbientIndicationContainer;
 import com.android.systemui.animation.ActivityTransitionAnimator;
 import com.android.systemui.assist.AssistManager;
 import com.android.systemui.back.domain.interactor.BackActionInteractor;
@@ -253,6 +254,7 @@ import com.android.systemui.util.WallpaperController;
 import com.android.systemui.util.concurrency.DelayableExecutor;
 import com.android.systemui.util.concurrency.MessageRouter;
 import com.android.systemui.util.kotlin.JavaAdapter;
+import com.android.systemui.util.wakelock.WakeLockLogger;
 import com.android.systemui.volume.VolumeComponent;
 import com.android.wm.shell.bubbles.Bubbles;
 import com.android.wm.shell.startingsurface.SplashscreenContentDrawer;
@@ -321,6 +323,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     private static final int BRIGHTNESS_CONTROL_LINGER_THRESHOLD = 20;
 
     private final Context mContext;
+    private WakeLockLogger mWakeLockLogger;
     private final LockscreenShadeTransitionController mLockscreenShadeTransitionController;
     private final DeviceStateManager mDeviceStateManager;
     private final Lazy<CentralSurfacesCommandQueueCallbacks> mCommandQueueCallbacksLazy;
@@ -773,7 +776,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             ActivityStarter activityStarter,
             SceneContainerFlags sceneContainerFlags,
             SysUiState sysUiState,
-            BurnInProtectionController burnInProtectionController
+            BurnInProtectionController burnInProtectionController,
+            WakeLockLogger wakeLockLogger
     ) {
         mContext = context;
         mNotificationsController = notificationsController;
@@ -882,6 +886,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         mScreenOffAnimationController = screenOffAnimationController;
         mBurnInProtectionController = burnInProtectionController;
+        mWakeLockLogger = wakeLockLogger;
 
         ShadeExpansionListener shadeExpansionListener = this::onPanelExpansionChanged;
         ShadeExpansionChangeEvent currentState =
@@ -1291,6 +1296,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         mAmbientIndicationContainer = getNotificationShadeWindowView().findViewById(
                 R.id.ambient_indication_container);
+        if (mAmbientIndicationContainer != null) {
+            ((AmbientIndicationContainer) mAmbientIndicationContainer).initializeView(this, mMainHandler, mWakeLockLogger);
+        }
 
         mAutoHideController.setStatusBar(new AutoHideUiElement() {
             @Override
@@ -2258,6 +2266,11 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         }
     };
 
+    @Override
+    public NotificationLockscreenUserManager getNotificationLockscreenUserManager() {
+        return mLockscreenUserManager;
+    }
+
     /**
      * Reload some of our resources when the configuration changes.
      *
@@ -2661,6 +2674,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                 || (mDozing && mDozeParameters.shouldControlScreenOff() && keyguardVisibleOrWillBe);
 
         mShadeSurface.setDozing(mDozing, animate);
+
+        if (mAmbientIndicationContainer != null) {
+            ((AmbientIndicationContainer)mAmbientIndicationContainer)
+                    .updateKeyguardState(mState == StatusBarState.KEYGUARD);
+        } else {
+            Log.d("StatusBar", "updateKeyguardState -> AmbientIndicationContainer null");
+        }
         Trace.endSection();
     }
 
@@ -3465,6 +3485,13 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
             if (DEBUG) {
                 Log.v(TAG, "configuration changed: " + mContext.getResources().getConfiguration());
+            }
+
+            if (mAmbientIndicationContainer != null) {
+                ((AmbientIndicationContainer)mAmbientIndicationContainer)
+                        .updateDozingState(mDozing);
+            } else {
+                Log.d("StatusBar", "updateDozingState -> AmbientIndicationContainer null");
             }
         }
 
