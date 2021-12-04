@@ -7414,6 +7414,12 @@ public final class Settings {
         public static final String SETTINGS_TENX_DASHBOARD_WEATHER_TYPE = "settings_tenx_dashboard_weather_type";
 
         /**
+         * Enable\Disable swipe up or down gesture on ambient display like OOS
+         * @hide
+         */
+        public static final String DOZE_AMBIENT_SWIPE = "doze_ambient_swipe";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
