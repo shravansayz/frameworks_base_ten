@@ -136,6 +136,8 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS =
             "android.theme.customization.monet.accurate_shade_settings";
+    static final String OVERLAY_CATEGORY_NAVBAR =
+            "android.theme.customization.navbar";
 
     /*
      * All theme customization categories used by the system, in order that they should be applied,
@@ -156,7 +158,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ICON_WIFI,
             OVERLAY_CATEGORY_ACCURATE_SHADE_ANDROID,
             OVERLAY_CATEGORY_ACCURATE_SHADE_SYSUI,
-            OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS);
+            OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS,
+            OVERLAY_CATEGORY_NAVBAR);
 
     /* Categories that need to be applied to the current user as well as the system user. */
     @VisibleForTesting
@@ -170,7 +173,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ICON_SYSUI,
             OVERLAY_CATEGORY_ACCURATE_SHADE_ANDROID,
             OVERLAY_CATEGORY_ACCURATE_SHADE_SYSUI,
-            OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS);
+            OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS
+            OVERLAY_CATEGORY_NAVBAR);
 
     /* Allowed overlay categories for each target package. */
     private final Map<String, Set<String>> mTargetPackageToCategories = new ArrayMap<>();
@@ -221,6 +225,7 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_ACCURATE_SHADE_ANDROID, ANDROID_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_ACCURATE_SHADE_SYSUI, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS, SETTINGS_PACKAGE);
+        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NAVBAR, SYSUI_PACKAGE);
 
         dumpManager.registerDumpable(TAG, this);
     }
