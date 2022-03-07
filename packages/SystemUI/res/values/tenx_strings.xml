@@ -201,4 +201,7 @@
     <!-- Screen record -->
     <string name="screenrecord_keep_screen_awake_label">Stay awake</string>
     <string name="screenrecord_keep_screen_awake_summary">Keep the screen on</string>
+
+    <!-- Name of the roaming status bar icon. -->
+    <string name="status_bar_roaming">Roaming indicator</string>
 </resources>
