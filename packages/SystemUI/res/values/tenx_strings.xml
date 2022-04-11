@@ -90,4 +90,11 @@
 
     <!-- Quick QS panel items -->
     <string name="tenx_text">#TenX-OS</string>
+
+    <!-- Preferred network tile -->
+    <string name="quick_settings_preferred_network_label">Preferred network</string>
+    <string name="quick_settings_preferred_network_lte">4g / LTE</string>
+    <string name="quick_settings_preferred_network_nr">5g / NR</string>
+    <string name="quick_settings_preferred_network_unsupported">Unsupported</string>
+
 </resources>
