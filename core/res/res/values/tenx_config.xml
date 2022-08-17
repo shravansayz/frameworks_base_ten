@@ -133,4 +133,7 @@
     <string name="config_sysGPULoad"></string>
     <integer name="config_sysCPUTempMultiplier">1</integer>
     <integer name="config_sysBatteryTempMultiplier">1</integer>
+
+    <!-- Whether to cancel fingerprint operation if not idle -->
+    <bool name="config_fpCancelIfNotIdle">false</bool>
 </resources>
