@@ -97,4 +97,6 @@
     <string name="quick_settings_preferred_network_nr">5g / NR</string>
     <string name="quick_settings_preferred_network_unsupported">Unsupported</string>
 
+    <!-- Button to restart SystemUI, within the Restart Options dialog -->
+    <string name="global_action_restart_systemui">SystemUI</string>
 </resources>
