@@ -24,6 +24,7 @@ import android.os.Looper;
 import com.android.internal.jank.InteractionJankMonitor;
 import com.android.systemui.CoreStartable;
 import com.android.systemui.dump.DumpManager;
+import com.android.systemui.flags.FeatureFlags;
 import com.android.systemui.media.dialog.MediaOutputDialogFactory;
 import com.android.systemui.plugins.VolumeDialog;
 import com.android.systemui.plugins.VolumeDialogController;
@@ -32,6 +33,7 @@ import com.android.systemui.statusbar.policy.AccessibilityManagerWrapper;
 import com.android.systemui.statusbar.policy.ConfigurationController;
 import com.android.systemui.statusbar.policy.DevicePostureController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
+import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.settings.SecureSettings;
 import com.android.systemui.util.time.SystemClock;
 import com.android.systemui.volume.CsdWarningDialog;
@@ -101,6 +103,7 @@ public interface VolumeModule {
             DeviceProvisionedController deviceProvisionedController,
             ConfigurationController configurationController,
             MediaOutputDialogFactory mediaOutputDialogFactory,
+            TunerService tunerService,
             InteractionJankMonitor interactionJankMonitor,
             VolumePanelNavigationInteractor volumePanelNavigationInteractor,
             VolumeNavigator volumeNavigator,
@@ -117,6 +120,7 @@ public interface VolumeModule {
                 deviceProvisionedController,
                 configurationController,
                 mediaOutputDialogFactory,
+                tunerService,
                 interactionJankMonitor,
                 volumePanelNavigationInteractor,
                 volumeNavigator,
