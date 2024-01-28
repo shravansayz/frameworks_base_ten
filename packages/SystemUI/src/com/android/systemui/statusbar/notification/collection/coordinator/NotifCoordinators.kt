@@ -64,6 +64,7 @@ class NotifCoordinatorsImpl @Inject constructor(
         dismissibilityCoordinator: DismissibilityCoordinator,
         dreamCoordinator: DreamCoordinator,
         statsLoggerCoordinator: NotificationStatsLoggerCoordinator,
+        pulseLightCoordinator: PulseLightCoordinator,
 ) : NotifCoordinators {
 
     private val mCoreCoordinators: MutableList<CoreCoordinator> = ArrayList()
@@ -101,6 +102,7 @@ class NotifCoordinatorsImpl @Inject constructor(
         mCoordinators.add(preparationCoordinator)
         mCoordinators.add(remoteInputCoordinator)
         mCoordinators.add(dismissibilityCoordinator)
+        mCoordinators.add(pulseLightCoordinator)
 
         if (featureFlags.isEnabled(LOCKSCREEN_WALLPAPER_DREAM_ENABLED)) {
             mCoordinators.add(dreamCoordinator)
