@@ -122,4 +122,7 @@
 
     <!-- HD calling icon -->
     <dimen name="signal_icon_viewport_size">24dp</dimen>
+
+    <!-- Statusbar clock chip -->
+    <dimen name="chip_corner_radius">28dp</dimen>
 </resources>
