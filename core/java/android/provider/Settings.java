@@ -7338,6 +7338,11 @@ public final class Settings {
         public static final String FLASHLIGHT_ON_CALL_RATE = "flashlight_on_call_rate";
 
         /**
+         * @hide
+         */
+        public static final String QS_PANEL_TILE_HAPTIC = "qs_panel_tile_haptic";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
