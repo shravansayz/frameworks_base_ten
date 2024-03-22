@@ -99,8 +99,8 @@ class PulseLightView @JvmOverloads constructor(
             UserHandle.USER_CURRENT
         )
         val color = getLightColor(notificationPackageName)
-        val leftView = findViewById<ImageView>(R.id.animation_left)
-        val rightView = findViewById<ImageView>(R.id.animation_right)
+        val leftView = requireViewById<ImageView>(R.id.animation_left)
+        val rightView = requireViewById<ImageView>(R.id.animation_right)
         leftView.setColorFilter(color)
         rightView.setColorFilter(color)
         leftView.layoutParams.width = width
