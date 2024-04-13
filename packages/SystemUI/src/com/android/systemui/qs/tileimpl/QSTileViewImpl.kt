@@ -811,7 +811,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         }
         if (!Objects.equals(secondaryLabel.text, state.secondaryLabel)) {
             secondaryLabel.text = state.secondaryLabel
-            secondaryLabel.visibility = if (TextUtils.isEmpty(state.secondaryLabel)) {
+            secondaryLabel.visibility = if (TextUtils.isEmpty(secondaryLabel.text)) {
                 if (isA11Style) INVISIBLE else GONE
             } else {
                 if (secondaryLabelHide) GONE else VISIBLE
