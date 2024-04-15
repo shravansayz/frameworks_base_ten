@@ -34,7 +34,7 @@ import com.android.systemui.surfaceeffects.ripple.RippleShader
 
 import com.android.systemui.R
 
-private const val RIPPLE_SPARKLE_STRENGTH: Float = 0.7f
+private const val RIPPLE_SPARKLE_STRENGTH: Float = 0.8f
 
 /**
  * Handles two ripple effects: dwell ripple and unlocked ripple
