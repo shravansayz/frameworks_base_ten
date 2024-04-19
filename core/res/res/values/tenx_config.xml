@@ -149,4 +149,7 @@
   <!-- List of system apps that are allowed to be locked with app lock.
         Use with extreme caution. -->
   <string-array name="config_appLockAllowedSystemApps" translatable="false" />
+
+  <!-- Whether to show edge light only when the device is face down by default -->
+  <bool name="config_edgeLightFaceDownEnabledByDefault">false</bool>
 </resources>

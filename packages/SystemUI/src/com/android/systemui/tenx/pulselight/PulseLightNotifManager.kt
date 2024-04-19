@@ -49,8 +49,12 @@ class PulseLightNotifManager @Inject constructor(
     private val pulsingTime: Long
         get() = lightCount * duration * 1000L // in ms
 
-    private val onlyWhenFaceDown by lazy {
-        context.resources.getBoolean(R.bool.config_showEdgeLightOnlyWhenFaceDown)
+    private var onlyWhenFaceDown = false
+    private val onlyWhenFaceDownDefault by lazy {
+        val default = context.resources.getBoolean(
+            com.android.internal.R.bool.config_edgeLightFaceDownEnabledByDefault
+        )
+        if (default) 1 else 0
     }
 
     private var faceDownDetector: FaceDownDetector? = null
@@ -73,7 +77,6 @@ class PulseLightNotifManager @Inject constructor(
 
     init {
         setupContentObserver()
-        setupFaceDownDetector()
     }
 
     private fun setupContentObserver() {
@@ -81,6 +84,7 @@ class PulseLightNotifManager @Inject constructor(
         val pulseAmbientLightDuration = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_DURATION)
         val pulseAmbientLightRepeatCount =
                 Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_REPEAT_COUNT)
+        val pulseAmbientLightFaceDown = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_FACE_DOWN)
         val contentObserver = object: ContentObserver(null) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 when (uri) {
@@ -95,6 +99,13 @@ class PulseLightNotifManager @Inject constructor(
                         // so to get actual lights animation count, repeat + 1.
                         lightCount = 1 + getSettingsInt(PULSE_AMBIENT_LIGHT_REPEAT_COUNT, 0)
                     }
+                    pulseAmbientLightFaceDown -> {
+                        onlyWhenFaceDown = getSettingsInt(
+                            PULSE_AMBIENT_LIGHT_FACE_DOWN,
+                            onlyWhenFaceDownDefault
+                        ) != 0
+                        setupFaceDownDetector()
+                    }
                     else -> { /* Nothing */}
                 }
             }
@@ -105,15 +116,21 @@ class PulseLightNotifManager @Inject constructor(
                 pulseAmbientLightDuration, false, contentObserver, UserHandle.USER_CURRENT)
         context.contentResolver.registerContentObserver(
                 pulseAmbientLightRepeatCount, false, contentObserver, UserHandle.USER_CURRENT)
+        context.contentResolver.registerContentObserver(
+                pulseAmbientLightFaceDown, false, contentObserver, UserHandle.USER_CURRENT)
         contentObserver.onChange(true, pulseAmbientLight)
         contentObserver.onChange(true, pulseAmbientLightDuration)
         contentObserver.onChange(true, pulseAmbientLightRepeatCount)
+        contentObserver.onChange(true, pulseAmbientLightFaceDown)
     }
 
     private fun setupFaceDownDetector() {
         if (onlyWhenFaceDown) {
             faceDownDetector = FaceDownDetector(context, this::onFlip)
             statusBarStateController.addCallback(statusBarStateListener)
+        } else {
+            faceDownDetector = null
+            statusBarStateController.removeCallback(statusBarStateListener)
         }
     }
 
@@ -179,6 +196,8 @@ class PulseLightNotifManager @Inject constructor(
                 Settings.Secure.PULSE_AMBIENT_LIGHT_DURATION
         private const val PULSE_AMBIENT_LIGHT_REPEAT_COUNT =
                 Settings.Secure.PULSE_AMBIENT_LIGHT_REPEAT_COUNT
+        private const val PULSE_AMBIENT_LIGHT_FACE_DOWN =
+                Settings.Secure.PULSE_AMBIENT_LIGHT_FACE_DOWN
     }
 
 }
