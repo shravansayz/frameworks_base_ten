@@ -54,12 +54,15 @@ import android.app.WallpaperManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.om.IOverlayManager;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.database.ContentObserver;
 import android.database.ContentObserver;
 import android.graphics.Point;
 import android.hardware.devicestate.DeviceStateManager;
@@ -116,6 +119,7 @@ import com.android.internal.logging.UiEventLoggerImpl;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.RegisterStatusBarResult;
+import com.android.internal.util.tenx.ThemeUtils;
 import com.android.internal.util.tenx.Utils;
 import com.android.keyguard.AuthKeyguardMessageArea;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -543,6 +547,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         }
     }
 
+    private Handler mMainHandler;
     private final DelayableExecutor mMainExecutor;
 
     private int mInteractingWindows;
@@ -577,6 +582,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
     private final LifecycleRegistry mLifecycle = new LifecycleRegistry(this);
     protected final BatteryController mBatteryController;
+    private IOverlayManager mOverlayManager;
     private UiModeManager mUiModeManager;
     private LogMaker mStatusBarStateLog;
     protected final NotificationIconAreaController mNotificationIconAreaController;
@@ -735,6 +741,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             LockscreenShadeTransitionController lockscreenShadeTransitionController,
             FeatureFlags featureFlags,
             KeyguardUnlockAnimationController keyguardUnlockAnimationController,
+            @Main Handler mainHandler,
             @Main DelayableExecutor delayableExecutor,
             @Main MessageRouter messageRouter,
             WallpaperManager wallpaperManager,
@@ -839,6 +846,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         mFeatureFlags = featureFlags;
         mIsShortcutListSearchEnabled = featureFlags.isEnabled(Flags.SHORTCUT_LIST_SEARCH_LAYOUT);
         mKeyguardUnlockAnimationController = keyguardUnlockAnimationController;
+        mMainHandler = mainHandler;
         mMainExecutor = delayableExecutor;
         mMessageRouter = messageRouter;
         mWallpaperManager = wallpaperManager;
@@ -931,6 +939,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         mAccessibilityManager = (AccessibilityManager)
                 mContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
 
+        mOverlayManager = IOverlayManager.Stub.asInterface(
+                ServiceManager.getService(Context.OVERLAY_SERVICE));
+
         mKeyguardUpdateMonitor.setKeyguardBypassController(mKeyguardBypassController);
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -954,6 +965,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         // Set up the initial notification state. This needs to happen before CommandQueue.disable()
         setUpPresenter();
+
+        mTenXSettingsObserver.observe();
+        mTenXSettingsObserver.update();
 
         if ((result.mTransientBarTypes & WindowInsets.Type.statusBars()) != 0) {
             mStatusBarModeRepository.getDefaultDisplay().showTransient();
@@ -1678,6 +1692,33 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
         AnimateExpandSettingsPanelMessage(String subpanel) {
             mSubpanel = subpanel;
+        }
+    }
+
+    private TenXSettingsObserver mTenXSettingsObserver = new TenXSettingsObserver(mMainHandler);
+    private class TenXSettingsObserver extends ContentObserver {
+
+        TenXSettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE))) {
+                stockSettingsDashboardBackgroundSize();
+                updateSettingsDashboardBackgroundSize();
+            }
+        }
+
+        public void update() {
         }
     }
 
@@ -3121,6 +3162,18 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     @Override
     public boolean isDeviceInteractive() {
         return mDeviceInteractive;
+    }
+
+    // Switches settings dashboard background size from stock to custom
+    public void updateSettingsDashboardBackgroundSize() {
+        int settingsDashboardBackgroundSize = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE, 0, mLockscreenUserManager.getCurrentUserId());
+        ThemeUtils.updateSettingsDashboardBackgroundSize(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), settingsDashboardBackgroundSize);
+    }
+
+    // Switches settings dashboard background size back to stock
+    public void stockSettingsDashboardBackgroundSize() {
+       ThemeUtils.stockSettingsDashboardBackgroundSize(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {
