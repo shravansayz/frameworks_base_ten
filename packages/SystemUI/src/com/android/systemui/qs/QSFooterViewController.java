@@ -62,6 +62,8 @@ public class QSFooterViewController extends ViewController<QSFooterView>
 
     private static final String QS_SHOW_DATA_USAGE =
             "system:" + Settings.System.QS_SHOW_DATA_USAGE;
+    private static final String QS_SHOW_DATA_USAGE_ICON =
+            "system:" + Settings.System.QS_SHOW_DATA_USAGE_ICON;
 
     private final UserTracker mUserTracker;
     private final QSPanelController mQsPanelController;
@@ -147,7 +149,8 @@ public class QSFooterViewController extends ViewController<QSFooterView>
         mWifiTracker.fetchInitialState();
         mWifiTracker.setListening(true);
         mNetworkController.addCallback(mSignalCallback);
-        mTunerService.addTunable(this, QS_SHOW_DATA_USAGE);
+        mTunerService.addTunable(this, QS_SHOW_DATA_USAGE,
+                QS_SHOW_DATA_USAGE_ICON);
         mGlobalSettings.registerContentObserver(MULTI_SIM_DATA_CALL_SUBSCRIPTION,
                 mDataSwitchObserver);
 
@@ -166,9 +169,11 @@ public class QSFooterViewController extends ViewController<QSFooterView>
 
     @Override
     public void onTuningChanged(String key, String newValue) {
-         if (key.equals(QS_SHOW_DATA_USAGE)) {
-            mView.setShowDataUsage(TunerService.parseIntegerSwitch(newValue, false));
-         }
+        if (key.equals(QS_SHOW_DATA_USAGE)) {
+           mView.setShowDataUsage(TunerService.parseIntegerSwitch(newValue, false));
+        } else if (key.equals(QS_SHOW_DATA_USAGE_ICON)) {
+           mView.setShowDataUsageIcon(TunerService.parseIntegerSwitch(newValue, false));
+        }
     }
 
     @Override

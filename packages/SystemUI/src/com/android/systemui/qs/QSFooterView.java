@@ -21,6 +21,7 @@ import static android.app.StatusBarManager.DISABLE2_QUICK_SETTINGS;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -59,6 +60,7 @@ public class QSFooterView extends FrameLayout {
     private PageIndicator mPageIndicator;
     private TextView mUsageText;
     private View mEditButton;
+    private Drawable mIcon;
 
     @Nullable
     protected TouchAnimator mFooterAnimator;
@@ -68,8 +70,9 @@ public class QSFooterView extends FrameLayout {
     private float mExpansionAmount;
 
     private boolean mShouldShowDataUsage;
+    private boolean mShouldShowDataUsageIcon;
     private boolean mShouldShowUsageText;
- 
+
     @Nullable
     private OnClickListener mExpandClickListener;
 
@@ -117,6 +120,7 @@ public class QSFooterView extends FrameLayout {
         String suffix;
         if (mIsWifiConnected) {
             info = mDataController.getWifiDailyDataUsageInfo(true);
+            mIcon = mContext.getResources().getDrawable(R.drawable.ic_data_usage_wifi);
             if (info == null) {
                 info = mDataController.getWifiDailyDataUsageInfo(false);
                 suffix = mContext.getResources().getString(R.string.usage_wifi_default_suffix);
@@ -127,6 +131,7 @@ public class QSFooterView extends FrameLayout {
             mDataController.setSubscriptionId(mSubId);
             info = mDataController.getDailyDataUsageInfo();
             suffix = getSlotCarrierName();
+            mIcon = mContext.getResources().getDrawable(R.drawable.ic_data_usage_mobile);
         } else {
             mShouldShowUsageText = false;
             mUsageText.setText(null);
@@ -206,6 +211,13 @@ public class QSFooterView extends FrameLayout {
     protected void setShowDataUsage(boolean show) {
         if (mShouldShowDataUsage != show) {
             mShouldShowDataUsage = show;
+            updateVisibilities();
+        }
+    }
+
+    protected void setShowDataUsageIcon(boolean show) {
+        if (mShouldShowDataUsageIcon != show) {
+            mShouldShowDataUsageIcon = show;
             updateVisibilities();
         }
     }
@@ -305,5 +317,11 @@ public class QSFooterView extends FrameLayout {
     private void updateVisibilities() {
         mUsageText.setVisibility(mShouldShowDataUsage && mExpanded && mShouldShowUsageText
                 ? View.VISIBLE : View.INVISIBLE);
+
+        if (mUsageText.getVisibility() == View.VISIBLE && mShouldShowDataUsageIcon) {
+            mUsageText.setCompoundDrawablesWithIntrinsicBounds(mIcon, null, null, null);
+        } else {
+            mUsageText.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        }
     }
 }

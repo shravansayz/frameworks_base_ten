@@ -6468,6 +6468,12 @@ public final class Settings {
         public static final String QS_SHOW_DATA_USAGE = "qs_show_data_usage";
 
         /**
+         * Whether to show daily data usage in the QS footer.
+         * @hide
+         */
+        public static final String QS_SHOW_DATA_USAGE_ICON = "qs_show_data_usage_icon";
+
+        /**
          * Change quick settings tiles animation style
          * @hide
          */
