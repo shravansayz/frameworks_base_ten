@@ -1516,10 +1516,76 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     @Override
     public void updateDismissAllButton() {
         if (mDismissAllButton == null) return;
-        mDismissAllButton.setImageResource(R.drawable.dismiss_all_icon);
+        updateDismissButtonIconStyle(mDismissAllButton);
         mDismissAllButton.setElevation(mContext.getResources().getDimension(R.dimen.dismiss_all_button_elevation));
         mDismissAllButton.setColorFilter(mContext.getColor(R.color.notif_pill_text));
-        mDismissAllButton.setBackground(mContext.getTheme().getDrawable(R.drawable.dismiss_all_background));
+        updateDismissButtonBackgroundStyle(mDismissAllButton);
+    }
+
+    public void updateDismissButtonBackgroundStyle(ImageButton dismissButton) {
+        int mDismissButtonBackgroundStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+	            Settings.System.NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE, 0, UserHandle.USER_CURRENT);
+
+        switch (mDismissButtonBackgroundStyle) {
+            // Rectangle
+            case 1:
+                dismissButton.setBackground(mContext.getTheme().getDrawable(R.drawable.dismiss_all_background_rectangle));
+                break;
+            // Oval
+            case 0:
+            default:
+                dismissButton.setBackground(mContext.getTheme().getDrawable(R.drawable.dismiss_all_background_oval));
+                break;
+        }
+    }
+
+    public void updateDismissButtonIconStyle(ImageButton dismissButton) {
+        int mDismissButtonIconStyle = Settings.System.getIntForUser(mContext.getContentResolver(),
+	            Settings.System.NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE, 0, UserHandle.USER_CURRENT);
+
+        switch (mDismissButtonIconStyle) {
+            // ZZZ icon
+            case 1:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_zzz);
+                break;
+            // Delete icon
+            case 2:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_delete);
+                break;
+            // Graph icon
+            case 3:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_graph);
+                break;
+            // Layers icon
+            case 4:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_layers);
+                break;
+            // Arrow left icon
+            case 5:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_arrow_left);
+                break;
+            // Arrow right icon
+            case 6:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_arrow_right);
+                break;
+            // Bell
+            case 7:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_bell);
+                break;
+            // half moon
+            case 8:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_half_moon);
+                break;
+            // Clear (X)
+            case 9:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_clear);
+                break;
+            // Default
+            case 0:
+            default:
+                dismissButton.setImageResource(R.drawable.dismiss_all_icon_default);
+                break;
+        }
     }
 
     @Override
@@ -1707,6 +1773,12 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -1715,10 +1787,18 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                     Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE))) {
                 stockSettingsDashboardBackgroundSize();
                 updateSettingsDashboardBackgroundSize();
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE))) {
+                updateDismissButtonBackgroundStyle(mDismissAllButton);
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE))) {
+                updateDismissButtonIconStyle(mDismissAllButton);
             }
         }
 
         public void update() {
+            updateDismissButtonBackgroundStyle(mDismissAllButton);
+            updateDismissButtonIconStyle(mDismissAllButton);
         }
     }
 

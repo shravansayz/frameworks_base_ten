@@ -6586,6 +6586,18 @@ public final class Settings {
         public static final String NOTIFICATION_MATERIAL_DISMISS = "notification_material_dismiss";
 
         /**
+         * Material Dismiss All Button for notifications background styles
+         * @hide
+         */
+        public static final String NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE = "notification_material_dismiss_background_style";
+
+        /**
+         * Material Dismiss All Button for notifications icon styles
+         * @hide
+         */
+	public static final String NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE = "notification_material_dismiss_icon_style";
+
+        /**
          * Whether to turn on Bluetooth automatically when showing the Bluetooth dialog
          * @hide
          */
