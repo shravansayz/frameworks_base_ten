@@ -29,6 +29,7 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.RippleDrawable
+import android.graphics.drawable.StateListDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Trace
 import android.os.UserHandle
@@ -420,9 +421,23 @@ open class QSTileViewImpl @JvmOverloads constructor(
             backgroundOverlayDrawable =
                 (backgroundDrawable as LayerDrawable).findDrawableByLayerId(R.id.qs_tile_background_overlay)
             backgroundOverlayDrawable.mutate().setTintMode(PorterDuff.Mode.SRC)
+
+            val defaultRadius = context.resources.getDimensionPixelSize(R.dimen.qs_corner_radius)
+            val appliedCornerRadius = TileUtils.setDefaultQsTileCornerRadius(mContext, defaultRadius)
+
+            val maskDrawable = ripple.getDrawable(0) as GradientDrawable
+            maskDrawable.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+
+            val backgroundBase = backgroundBaseDrawable as GradientDrawable
+            backgroundBase.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
         }
 
         return ripple
+    }
+
+    fun dpToPixels(context: Context, dp: Int): Float {
+        val density = context.resources.displayMetrics.density
+        return dp * density
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

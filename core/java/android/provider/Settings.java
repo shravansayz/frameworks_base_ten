@@ -6697,6 +6697,12 @@ public final class Settings {
         public static final String SETTINGS_DASHBOARD_BACKGROUND_SIZE = "settings_dashboard_background_size";
 
         /**
+         * Default QS tile radius
+         * @hide
+         */
+        public static final String DEFAULT_QS_TILE_CORNER_RADIUS = "default_qs_tile_corner_radius";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
