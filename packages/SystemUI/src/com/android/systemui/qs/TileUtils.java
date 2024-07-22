@@ -104,4 +104,10 @@ public class TileUtils {
                 Settings.System.DEFAULT_QS_TILE_CORNER_RADIUS,
                 defaultValue, UserHandle.USER_CURRENT);
     }
+
+    public static int setDefaultQsTileStyles(Context context) {
+        return Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.DEFAULT_QS_TILE_STYLES,
+                0, UserHandle.USER_CURRENT);
+    }
 }

@@ -6703,6 +6703,12 @@ public final class Settings {
         public static final String DEFAULT_QS_TILE_CORNER_RADIUS = "default_qs_tile_corner_radius";
 
         /**
+         * Default QS tile styles
+         * @hide
+         */
+        public static final String DEFAULT_QS_TILE_STYLES = "default_qs_tile_styles";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
