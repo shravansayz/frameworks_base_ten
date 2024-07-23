@@ -442,9 +442,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
                 backgroundBase.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
                 maskDrawable.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
             } else if (defaultQsTileStyles == 2) { // Stroked with background alpha
-                val colorAccent = 
-                        Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.colorAccent)
-                backgroundBase.setColor(setAlpha(colorAccent, 100))
+                backgroundBase.setColor(Utils.applyAlpha(0.1f, colorActive))
                 backgroundBase.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
                 maskDrawable.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
             } else if (defaultQsTileStyles == 3) { // Android oreo like tiles
@@ -459,10 +457,6 @@ open class QSTileViewImpl @JvmOverloads constructor(
     fun dpToPixels(context: Context, dp: Int): Float {
         val density = context.resources.displayMetrics.density
         return dp * density
-    }
-
-    fun setAlpha(color: Int, alpha: Int): Int {
-        return (color and 0x00FFFFFF) or (alpha shl 24)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
