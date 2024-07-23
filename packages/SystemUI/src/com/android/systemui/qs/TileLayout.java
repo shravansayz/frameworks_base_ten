@@ -256,7 +256,7 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
     }
 
     protected int getCellHeight() {
-        if (TileUtils.getQSTileLabelHide(mContext)) {
+        if (TileUtils.getQSTileLabelHide(mContext) || TileUtils.getQSTileSecondaryLabelHide(mContext)) {
             return getResources().getDimensionPixelSize(R.dimen.qs_quick_tile_size);
         }
         // Compare estimated height with resource height and return the larger one.

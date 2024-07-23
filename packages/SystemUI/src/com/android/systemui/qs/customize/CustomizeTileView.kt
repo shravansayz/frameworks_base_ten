@@ -43,6 +43,9 @@ class CustomizeTileView(context: Context) : QSTileViewImpl(context, collapsed = 
     private fun isA11Style(): Boolean = Settings.System.getIntForUser(context.contentResolver, 
     Settings.System.QS_TILE_UI_STYLE, 0,  UserHandle.USER_CURRENT) != 0
 
+    private fun isSecondaryLabelHidden(): Boolean = Settings.System.getIntForUser(context.contentResolver,
+    Settings.System.QS_TILE_SECONDARY_LABEL_HIDE, 0,  UserHandle.USER_CURRENT) != 0
+
     override fun handleStateChanged(state: QSTile.State) {
         super.handleStateChanged(state)
         showRippleEffect = false
@@ -53,6 +56,8 @@ class CustomizeTileView(context: Context) : QSTileViewImpl(context, collapsed = 
     private fun getVisibilityState(text: CharSequence?): Int {
         return if (showAppLabel && !TextUtils.isEmpty(text)) {
             VISIBLE
+        } else if (isSecondaryLabelHidden()) {
+            GONE
         } else {
             if (isA11Style()) INVISIBLE else GONE
         }

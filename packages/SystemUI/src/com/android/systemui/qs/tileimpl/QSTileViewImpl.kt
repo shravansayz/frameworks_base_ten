@@ -209,6 +209,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var vertical = false
     private val forceHideCheveron = true
     private var labelHide = false
+    private var secondaryLabelHide = false
     private var labelSize = 14f
 
     init {
@@ -221,6 +222,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
         vertical = TileUtils.getQSTileVerticalLayout(context, if (vertical) 1 else 0)
         labelHide = TileUtils.getQSTileLabelHide(context)
+        secondaryLabelHide = TileUtils.getQSTileSecondaryLabelHide(context)
 
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
         clipChildren = false
@@ -309,7 +311,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
             gravity = Gravity.CENTER_VERTICAL or Gravity.START  
         }
 
-        if (labelHide)
+        if (labelHide || secondaryLabelHide)
             gravity = Gravity.CENTER_HORIZONTAL or Gravity.CENTER_VERTICAL
 
         val padding = resources.getDimensionPixelSize(R.dimen.qs_tile_padding)
@@ -610,7 +612,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
         super.onInitializeAccessibilityNodeInfo(info)
         // Clear selected state so it is not announce by talkback.
         info.isSelected = false
-        info.text = if (TextUtils.isEmpty(secondaryLabel.text)) {
+        info.text = if (TextUtils.isEmpty(secondaryLabel.text) || secondaryLabelHide) {
             "${label.text}"
         } else {
             "${label.text}, ${secondaryLabel.text}"
@@ -713,7 +715,7 @@ open class QSTileViewImpl @JvmOverloads constructor(
             secondaryLabel.visibility = if (TextUtils.isEmpty(state.secondaryLabel)) {
                 if (isA11Style) INVISIBLE else GONE
             } else {
-                VISIBLE
+                if (secondaryLabelHide) GONE else VISIBLE
             }
         }
 

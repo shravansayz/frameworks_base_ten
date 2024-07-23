@@ -79,6 +79,12 @@ public class TileUtils {
                 0, UserHandle.USER_CURRENT) != 0;
     }
 
+    public static boolean getQSTileSecondaryLabelHide(Context context) {
+        return Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.QS_TILE_SECONDARY_LABEL_HIDE,
+                0, UserHandle.USER_CURRENT) != 0;
+    }
+
     public static float getQSTileLabelSize(Context context) {
         int labelSize = Settings.System.getIntForUser(context.getContentResolver(),
                 Settings.System.QS_TILE_LABEL_SIZE,

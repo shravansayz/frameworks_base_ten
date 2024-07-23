@@ -6502,6 +6502,12 @@ public final class Settings {
         public static final String QS_TILE_LABEL_HIDE = "qs_tile_label_hide";
 
         /**
+         * Hide secondary qs label only
+         * @hide
+         */
+        public static final String QS_TILE_SECONDARY_LABEL_HIDE = "qs_tile_secondary_label_hide";
+
+        /**
          * @hide
          */
         public static final String QS_TILE_LABEL_SIZE = "qs_tile_label_size";
