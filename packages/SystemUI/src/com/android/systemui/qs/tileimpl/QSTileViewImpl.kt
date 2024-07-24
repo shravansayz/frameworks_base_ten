@@ -66,6 +66,7 @@ import com.android.systemui.qs.logging.QSLogger
 import com.android.systemui.qs.tileimpl.QSIconViewImpl.QS_ANIM_LENGTH
 import com.android.systemui.res.R
 import java.util.Objects
+import java.util.Random
 
 private const val TAG = "QSTileViewImpl"
 open class QSTileViewImpl @JvmOverloads constructor(
@@ -143,6 +144,13 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private val colorSecondaryLabelUnavailable =
         Utils.getColorAttrDefaultColor(context, R.attr.outline)
 
+    private val colorAccent = 
+            Utils.getColorAttrDefaultColor(context, com.android.internal.R.attr.colorAccent)
+    private val colorPrimary =
+            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorPrimary)
+    private val colorSecondary =
+            Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
+
     private lateinit var iconContainer: LinearLayout
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -211,6 +219,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private var labelHide = false
     private var secondaryLabelHide = false
     private var labelSize = 14f
+    private val rnd = Random()
+    private val randomColor = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
 
     init {
         val typedValue = TypedValue()
@@ -897,9 +907,21 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     private fun getLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
+        val qsTileLabelColor = Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.QS_TILE_PRIMARY_LABEL_COLOR, 0, UserHandle.USER_CURRENT);
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorLabelUnavailable
-            state == Tile.STATE_ACTIVE -> colorLabelActive
+            state == Tile.STATE_ACTIVE ->
+            if (qsTileLabelColor == 1)
+                colorAccent
+            else if (qsTileLabelColor == 2)
+                colorPrimary
+            else if (qsTileLabelColor == 3)
+                colorSecondary
+            else if (qsTileLabelColor == 4)
+                randomColor
+            else
+                colorLabelActive
             state == Tile.STATE_INACTIVE -> colorLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
@@ -909,9 +931,21 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     private fun getSecondaryLabelColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
+        val qsTileSecondaryLabelColor = Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.QS_TILE_SECONDARY_LABEL_COLOR, 0, UserHandle.USER_CURRENT);
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorSecondaryLabelUnavailable
-            state == Tile.STATE_ACTIVE -> colorSecondaryLabelActive
+            state == Tile.STATE_ACTIVE ->
+            if (qsTileSecondaryLabelColor == 1)
+                colorAccent
+            else if (qsTileSecondaryLabelColor == 2)
+                colorPrimary
+            else if (qsTileSecondaryLabelColor == 3)
+                colorSecondary
+            else if (qsTileSecondaryLabelColor == 4)
+                randomColor
+            else
+                colorSecondaryLabelActive
             state == Tile.STATE_INACTIVE -> colorSecondaryLabelInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")

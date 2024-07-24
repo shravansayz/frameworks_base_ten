@@ -231,6 +231,9 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
         mTunerService.addTunable(this, QSPanel.QS_LAYOUT_COLUMNS_LANDSCAPE);
         mTunerService.addTunable(this, QSPanel.QQS_LAYOUT_ROWS);
         mTunerService.addTunable(this, QSPanel.QQS_LAYOUT_ROWS_LANDSCAPE);
+        mTunerService.addTunable(this, QSPanel.QS_TILE_ICON_COLOR);
+        mTunerService.addTunable(this, QSPanel.QS_TILE_PRIMARY_LABEL_COLOR);
+        mTunerService.addTunable(this, QSPanel.QS_TILE_SECONDARY_LABEL_COLOR);
     }
 
     @Override
@@ -569,6 +572,9 @@ public abstract class QSPanelControllerBase<T extends QSPanel> extends ViewContr
             case QSPanel.QS_LAYOUT_COLUMNS_LANDSCAPE:
             case QSPanel.QQS_LAYOUT_ROWS:
             case QSPanel.QQS_LAYOUT_ROWS_LANDSCAPE:
+            case QSPanel.QS_TILE_ICON_COLOR:
+            case QSPanel.QS_TILE_PRIMARY_LABEL_COLOR:
+            case QSPanel.QS_TILE_SECONDARY_LABEL_COLOR:
                 if (mView.getTileLayout() != null) {
                     mView.getTileLayout().updateSettings();
                     mForceUpdate = true;

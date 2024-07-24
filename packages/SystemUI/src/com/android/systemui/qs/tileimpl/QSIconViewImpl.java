@@ -24,9 +24,12 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.Animatable2.AnimationCallback;
 import android.graphics.drawable.Drawable;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.service.quicksettings.Tile;
 import android.util.Log;
 import android.view.View;
@@ -250,12 +253,27 @@ public class QSIconViewImpl extends QSIconView {
      * Color to tint the tile icon based on state
      */
     private static int getIconColorForState(Context context, QSTile.State state) {
+        int setQsIconColor = Settings.System.getIntForUser(context.getContentResolver(),
+                Settings.System.QS_TILE_ICON_COLOR, 0, UserHandle.USER_CURRENT);
         if (state.disabledByPolicy || state.state == Tile.STATE_UNAVAILABLE) {
             return Utils.getColorAttrDefaultColor(context, R.attr.outline);
         } else if (state.state == Tile.STATE_INACTIVE) {
             return Utils.getColorAttrDefaultColor(context, R.attr.onShadeInactiveVariant);
         } else if (state.state == Tile.STATE_ACTIVE) {
-            return Utils.getColorAttrDefaultColor(context, R.attr.onShadeActive);
+            if (setQsIconColor == 1) {
+                return Utils.getColorAttrDefaultColor(context,
+                        android.R.attr.colorAccent);
+            } else if (setQsIconColor == 2) {
+                 return Utils.getColorAttrDefaultColor(context,
+                        android.R.attr.textColorPrimary);
+            } else if (setQsIconColor == 3) {
+                 return Utils.getColorAttrDefaultColor(context,
+                        android.R.attr.textColorSecondary);
+            } else if (setQsIconColor == 4) {
+                 return randomColor();
+            } else {
+                return Utils.getColorAttrDefaultColor(context, R.attr.onShadeActive);
+            }
         } else {
             Log.e("QSIconView", "Invalid state " + state);
             return 0;
@@ -281,5 +299,12 @@ public class QSIconViewImpl extends QSIconView {
             super.onAnimationEnd(animation);
             mRunnable.run();
         }
+    }
+
+    public static int randomColor() {
+        int red = (int) (0xff * Math.random());
+        int green = (int) (0xff * Math.random());
+        int blue = (int) (0xff * Math.random());
+        return Color.argb(255, red, green, blue);
     }
 }

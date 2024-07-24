@@ -94,6 +94,12 @@ public class QSPanel extends LinearLayout implements Tunable {
             "system:" + Settings.System.QQS_LAYOUT_ROWS;
     public static final String QQS_LAYOUT_ROWS_LANDSCAPE =
             "system:" + Settings.System.QQS_LAYOUT_ROWS_LANDSCAPE;
+    public static final String QS_TILE_ICON_COLOR =
+            "system:" + Settings.System.QS_TILE_ICON_COLOR;
+    public static final String QS_TILE_PRIMARY_LABEL_COLOR =
+            "system:" + Settings.System.QS_TILE_PRIMARY_LABEL_COLOR;
+    public static final String QS_TILE_SECONDARY_LABEL_COLOR =
+            "system:" + Settings.System.QS_TILE_SECONDARY_LABEL_COLOR;
 
     private static final String TAG = "QSPanel";
 
