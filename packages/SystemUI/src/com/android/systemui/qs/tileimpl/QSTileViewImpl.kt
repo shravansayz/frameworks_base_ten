@@ -151,6 +151,9 @@ open class QSTileViewImpl @JvmOverloads constructor(
     private val colorSecondary =
             Utils.getColorAttrDefaultColor(context, android.R.attr.textColorSecondary)
 
+    private val gradientStartColor = resources.getColor(R.color.holo_blue_light)
+    private val gradientEndColor = resources.getColor(R.color.holo_green_light)
+
     private lateinit var iconContainer: LinearLayout
     private lateinit var label: TextView
     protected lateinit var secondaryLabel: TextView
@@ -437,27 +440,50 @@ open class QSTileViewImpl @JvmOverloads constructor(
             val defaultRadius = context.resources.getDimensionPixelSize(R.dimen.qs_corner_radius)
             val appliedCornerRadius = TileUtils.setDefaultQsTileCornerRadius(mContext, defaultRadius)
 
-            val maskDrawable = ripple.getDrawable(0) as GradientDrawable
-            maskDrawable.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+            val maskLayerDrawable = ripple.getDrawable(0) as LayerDrawable
+            val maskGradientDrawableFirst = maskLayerDrawable.getDrawable(0) as GradientDrawable
+            val maskGradientDrawableSecond = maskLayerDrawable.getDrawable(1) as GradientDrawable
 
-            val backgroundBase = backgroundBaseDrawable as GradientDrawable
-            backgroundBase.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+            maskGradientDrawableFirst.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+            maskGradientDrawableSecond.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+
+            val baseDrawable = backgroundBaseDrawable as LayerDrawable
+            val backgroundBaseFirst = baseDrawable.getDrawable(0) as GradientDrawable
+            val backgroundBaseSecond = baseDrawable.getDrawable(1) as GradientDrawable
+
+            backgroundBaseFirst.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
+            backgroundBaseSecond.cornerRadius = dpToPixels(mContext, appliedCornerRadius)
 
             val defaultQsTileStyles = TileUtils.setDefaultQsTileStyles(mContext)
             if (defaultQsTileStyles == 0) { // Default style
-                backgroundBase.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
-                maskDrawable.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseSecond.colors = intArrayOf(
+                                                  getBackgroundColorForState(QSTile.State.DEFAULT_STATE),
+                                                  getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
             } else if (defaultQsTileStyles == 1) { // Stroked style
-                backgroundBase.setColor(Color.TRANSPARENT)
-                backgroundBase.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
-                maskDrawable.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseFirst.setColor(Color.TRANSPARENT)
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
             } else if (defaultQsTileStyles == 2) { // Stroked with background alpha
-                backgroundBase.setColor(Utils.applyAlpha(0.1f, colorActive))
-                backgroundBase.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
-                maskDrawable.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, colorActive))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4, getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
             } else if (defaultQsTileStyles == 3) { // Android oreo like tiles
-                backgroundBase.setColor(Color.TRANSPARENT)
-                maskDrawable.setColor(Color.TRANSPARENT)
+                backgroundBaseFirst.setColor(Color.TRANSPARENT)
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 4) { // Gradients
+                backgroundBaseFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                backgroundBaseSecond.colors = intArrayOf(gradientStartColor, gradientEndColor)
+                maskGradientDrawableFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
             }
         }
 
@@ -895,10 +921,15 @@ open class QSTileViewImpl @JvmOverloads constructor(
     }
 
     private fun getBackgroundColorForState(state: Int, disabledByPolicy: Boolean = false): Int {
+        val defaultQsTileStyles = TileUtils.setDefaultQsTileStyles(context)
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
             state == Tile.STATE_ACTIVE -> colorActive
-            state == Tile.STATE_INACTIVE -> colorInactive
+            state == Tile.STATE_INACTIVE ->
+                if (defaultQsTileStyles == 4)
+                    colorUnavailable
+                else 
+                    colorInactive
             else -> {
                 Log.e(TAG, "Invalid state $state")
                 0
