@@ -484,6 +484,68 @@ open class QSTileViewImpl @JvmOverloads constructor(
                 backgroundBaseSecond.colors = intArrayOf(gradientStartColor, gradientEndColor)
                 maskGradientDrawableFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
                 maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 6) { // Random with alpha background
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, randomColor))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                maskGradientDrawableFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 7) { // Alpha background
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, colorActive))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                maskGradientDrawableFirst.setColor(getBackgroundColorForState(QSTile.State.DEFAULT_STATE))
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 8) { // Random stroke
+                backgroundBaseFirst.setColor(Color.TRANSPARENT)
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4, randomColor)
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 9) { // Random stroke with random alpha
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, randomColor))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4, randomColor)
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 10) { // Dashed stroke
+                backgroundBaseFirst.setColor(Color.TRANSPARENT)
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4,
+                        getBackgroundColorForState(QSTile.State.DEFAULT_STATE),
+                        dpToPixels(context, 6),
+                        dpToPixels(context, 6)
+                )
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 11) { // Dashed stroke with alpha
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, colorActive))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4,
+                        getBackgroundColorForState(QSTile.State.DEFAULT_STATE),
+                        dpToPixels(context, 6),
+                        dpToPixels(context, 6)
+                )
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)    
+            } else if (defaultQsTileStyles == 12) { // Random dashed stroke
+                backgroundBaseFirst.setColor(Color.TRANSPARENT)
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4,
+                        randomColor,
+                        dpToPixels(context, 6),
+                        dpToPixels(context, 6)
+                )
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+            } else if (defaultQsTileStyles == 13) { // Random dashed stroke with random alpha
+                backgroundBaseFirst.setColor(Utils.applyAlpha(0.1f, randomColor))
+                backgroundBaseSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
+                backgroundBaseFirst.setStroke(4,
+                        randomColor,
+                        dpToPixels(context, 6),
+                        dpToPixels(context, 6)
+                )
+                maskGradientDrawableFirst.setColor(Color.TRANSPARENT)
+                maskGradientDrawableSecond.colors = intArrayOf(Color.TRANSPARENT, Color.TRANSPARENT)
             }
         }
 
@@ -924,9 +986,21 @@ open class QSTileViewImpl @JvmOverloads constructor(
         val defaultQsTileStyles = TileUtils.setDefaultQsTileStyles(context)
         return when {
             state == Tile.STATE_UNAVAILABLE || disabledByPolicy -> colorUnavailable
-            state == Tile.STATE_ACTIVE -> colorActive
+            state == Tile.STATE_ACTIVE ->
+                if (defaultQsTileStyles == 5 ||
+                        defaultQsTileStyles == 6 ||
+                        defaultQsTileStyles == 8 ||
+                        defaultQsTileStyles == 9 ||
+                        defaultQsTileStyles == 12 ||
+                        defaultQsTileStyles == 13)
+                    randomColor
+                else if (defaultQsTileStyles == 7)
+                    Utils.applyAlpha(0.1f, colorActive)
+                else
+                    colorActive
             state == Tile.STATE_INACTIVE ->
-                if (defaultQsTileStyles == 4)
+                if (defaultQsTileStyles == 4 ||
+                        defaultQsTileStyles == 7)
                     colorUnavailable
                 else 
                     colorInactive
