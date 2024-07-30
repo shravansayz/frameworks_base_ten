@@ -59,16 +59,6 @@ public class ThemeUtils {
     public static final String FONT_KEY = "android.theme.customization.font";
     public static final String ICON_SHAPE_KEY= "android.theme.customization.adaptive_icon_shape";
 
-    // Settings dashboard background size
-    public static final String[] SETTINGS_DASHBOARD_BACKGROUND_SIZE = {
-            "com.android.settings.background.size_default",
-            "com.android.settings.background.size_x",
-            "com.android.settings.background.size_y",
-            "com.android.settings.background.size_z",
-            "com.android.settings.background.size_zx",
-            "com.android.settings.background.size_zy",
-    };
-
     public static final Comparator<OverlayInfo> OVERLAY_INFO_COMPARATOR =
             Comparator.comparingInt(a -> a.priority);
 
@@ -240,33 +230,5 @@ public class ThemeUtils {
             }
         }
         return true;
-    }
-
-    // Switches settings dashboard background user selected.
-    public static void updateSettingsDashboardBackgroundSize(IOverlayManager om, int userId, int settingsDashboardSize) {
-        if (settingsDashboardSize == 0) {
-            stockSettingsDashboardBackgroundSize(om, userId);
-        } else {
-            try {
-                om.setEnabled(ThemeUtils.SETTINGS_DASHBOARD_BACKGROUND_SIZE[settingsDashboardSize],
-                        true, userId);
-            } catch (RemoteException e) {
-                Log.w(TAG, "Can't change settings dashboard background size", e);
-            }
-        }
-    }
-
-    // Switches settings dashboard background back to stock.
-    public static void stockSettingsDashboardBackgroundSize(IOverlayManager om, int userId) {
-        // skip index 0
-        for (int i = 0; i < ThemeUtils.SETTINGS_DASHBOARD_BACKGROUND_SIZE.length; i++) {
-            String settingsdashboardbackgroundsize = ThemeUtils.SETTINGS_DASHBOARD_BACKGROUND_SIZE[i];
-            try {
-                om.setEnabled(settingsdashboardbackgroundsize,
-                        false /*disable*/, userId);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

@@ -119,7 +119,6 @@ import com.android.internal.logging.UiEventLoggerImpl;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.RegisterStatusBarResult;
-import com.android.internal.util.tenx.ThemeUtils;
 import com.android.internal.util.tenx.Utils;
 import com.android.keyguard.AuthKeyguardMessageArea;
 import com.android.keyguard.KeyguardUpdateMonitor;
@@ -1771,9 +1770,6 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE),
-                    false, this, UserHandle.USER_ALL);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE),
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -1784,10 +1780,6 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             if (uri.equals(Settings.System.getUriFor(
-                    Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE))) {
-                stockSettingsDashboardBackgroundSize();
-                updateSettingsDashboardBackgroundSize();
-            } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_MATERIAL_DISMISS_BACKGROUND_STYLE))) {
                 updateDismissButtonBackgroundStyle(mDismissAllButton);
             } else if (uri.equals(Settings.System.getUriFor(
@@ -3242,18 +3234,6 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     @Override
     public boolean isDeviceInteractive() {
         return mDeviceInteractive;
-    }
-
-    // Switches settings dashboard background size from stock to custom
-    public void updateSettingsDashboardBackgroundSize() {
-        int settingsDashboardBackgroundSize = Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.SETTINGS_DASHBOARD_BACKGROUND_SIZE, 0, mLockscreenUserManager.getCurrentUserId());
-        ThemeUtils.updateSettingsDashboardBackgroundSize(mOverlayManager, mLockscreenUserManager.getCurrentUserId(), settingsDashboardBackgroundSize);
-    }
-
-    // Switches settings dashboard background size back to stock
-    public void stockSettingsDashboardBackgroundSize() {
-       ThemeUtils.stockSettingsDashboardBackgroundSize(mOverlayManager, mLockscreenUserManager.getCurrentUserId());
     }
 
     private final BroadcastReceiver mBannerActionBroadcastReceiver = new BroadcastReceiver() {
