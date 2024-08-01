@@ -237,6 +237,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
                     // Update view if there's anything new to show
                     if (output != getText()) {
                         setText(output);
+                        setPaddingRelative(getPaddingStart(), getPaddingTop(), dpToPixels(2), getPaddingBottom());
                     }
                 }
 
@@ -301,7 +302,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
                     unit = kunit;
                     formatSpeed = decimalFormat.format(speed / (float)Kilo);
                 } else {
-                    decimalFormat = new DecimalFormat("0.##");
+                    decimalFormat = new DecimalFormat("0.00");
                     unit = kunit;
                     formatSpeed = decimalFormat.format(speed / (float)Kilo);
                 }
@@ -518,7 +519,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
         if (mDrawable != drawable || mIconTint != newTint) {
             mDrawable = drawable;
             mIconTint = newTint;
-            setCompoundDrawablesWithIntrinsicBounds(null, null, mDrawable, null);
+            setCompoundDrawablesWithIntrinsicBounds(mDrawable, null, null, null);
             updateTrafficDrawable();
         }
     }
@@ -555,5 +556,10 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
         public LinkProperties getLinkProperties() {
             return mLinkProperties;
         }
+    }
+
+    private int dpToPixels(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 }
