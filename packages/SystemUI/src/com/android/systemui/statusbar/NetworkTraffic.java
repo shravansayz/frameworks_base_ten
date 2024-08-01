@@ -84,6 +84,8 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
             "lineagesecure:" + LineageSettings.Secure.NETWORK_TRAFFIC_REFRESH_INTERVAL;
     private static final String NETWORK_TRAFFIC_HIDEARROW =
             "lineagesecure:" + LineageSettings.Secure.NETWORK_TRAFFIC_HIDEARROW;
+    private static final String NETWORK_TRAFFIC_ICON_TYPE =
+            "lineagesecure:" + LineageSettings.Secure.NETWORK_TRAFFIC_ICON_TYPE;
 
     protected int mLocation = LOCATION_DISABLED;
     private int mMode = MODE_UPSTREAM_AND_DOWNSTREAM;
@@ -100,6 +102,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
     private int mUnits;
     protected int mIconTint = 0;
     protected int newTint = Color.WHITE;
+    private boolean mIndicatorType;
 
     private Drawable mDrawable;
 
@@ -371,6 +374,7 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
             tunerService.addTunable(this, NETWORK_TRAFFIC_UNITS);
             tunerService.addTunable(this, NETWORK_TRAFFIC_REFRESH_INTERVAL);
             tunerService.addTunable(this, NETWORK_TRAFFIC_HIDEARROW);
+            tunerService.addTunable(this, NETWORK_TRAFFIC_ICON_TYPE);
 
             mConnectionAvailable = mConnectivityManager.getActiveNetworkInfo() != null;
 
@@ -477,6 +481,12 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
                 }
                 setTrafficDrawable();
                 break;
+            case NETWORK_TRAFFIC_ICON_TYPE:
+                mIndicatorType =
+                        TunerService.parseIntegerSwitch(newValue, false);
+                updateViews();
+                setTrafficDrawable();
+                break;
             default:
                 break;
         }
@@ -505,13 +515,21 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
         if (mHideArrows) {
             drawableResId = 0;
         } else if (!mTrafficActive) {
-            drawableResId = R.drawable.stat_sys_network_traffic;
+            drawableResId = mIndicatorType ?
+                    R.drawable.stat_sys_network_traffic_aosp :
+                    R.drawable.stat_sys_network_traffic;
         } else if (mMode == MODE_UPSTREAM_ONLY || mSubMode == MODE_UPSTREAM_ONLY) {
-            drawableResId = R.drawable.stat_sys_network_traffic_up;
+            drawableResId = mIndicatorType ?
+                    R.drawable.stat_sys_network_traffic_up_aosp :
+                    R.drawable.stat_sys_network_traffic_up;
         } else if (mMode == MODE_DOWNSTREAM_ONLY || mSubMode == MODE_DOWNSTREAM_ONLY) {
-            drawableResId = R.drawable.stat_sys_network_traffic_down;
+            drawableResId = mIndicatorType ?
+                    R.drawable.stat_sys_network_traffic_down_aosp :
+                    R.drawable.stat_sys_network_traffic_down;
         } else if (mMode == MODE_UPSTREAM_AND_DOWNSTREAM) {
-            drawableResId = R.drawable.stat_sys_network_traffic_updown;
+            drawableResId = mIndicatorType ?
+                    R.drawable.stat_sys_network_traffic_up_down_aosp :
+                    R.drawable.stat_sys_network_traffic_updown;
         } else {
             drawableResId = 0;
         }
@@ -521,6 +539,12 @@ public class NetworkTraffic extends TextView implements TunerService.Tunable {
             mIconTint = newTint;
             setCompoundDrawablesWithIntrinsicBounds(mDrawable, null, null, null);
             updateTrafficDrawable();
+        }
+
+        if (mIndicatorType) {
+            setCompoundDrawablePadding(getResources().getDimensionPixelSize(R.dimen.aosp_network_traffic_icon_padding));
+        }  else {
+            setCompoundDrawablePadding(getResources().getDimensionPixelSize(R.dimen.default_network_traffic_icon_padding));
         }
     }
 
