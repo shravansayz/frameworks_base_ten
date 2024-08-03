@@ -6754,6 +6754,48 @@ public final class Settings {
 	public static final String QS_TILE_SECONDARY_LABEL_COLOR = "qs_tile_secondary_label_color";
 
         /**
+         * Use custom statusbar padding Start
+         *
+         * @hide
+         */
+        public static final String USE_CUSTOM_STATUSBAR_PADDING_START = "use_custom_statusbar_padding_start";
+
+        /**
+         * Statusbar padding Start
+         *
+         * @hide
+         */
+        public static final String CUSTOM_STATUSBAR_PADDING_START = "custom_statusbar_padding_start";
+
+        /**
+         * use custom statusbar padding End
+         *
+         * @hide
+         */
+        public static final String USE_CUSTOM_STATUSBAR_PADDING_END = "use_custom_statusbar_padding_end";
+
+        /**
+         * Statusbar padding End
+         *
+         * @hide
+         */
+        public static final String CUSTOM_STATUSBAR_PADDING_END = "custom_statusbar_padding_end";
+
+        /**
+         * use custom statusbar height
+         *
+         * @hide
+         */
+        public static final String USE_CUSTOM_STATUSBAR_HEIGHT = "use_custom_statusbar_height";
+
+        /**
+         * Statusbar height
+         *
+         * @hide
+         */
+        public static final String CUSTOM_STATUSBAR_HEIGHT = "custom_statusbar_height";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *

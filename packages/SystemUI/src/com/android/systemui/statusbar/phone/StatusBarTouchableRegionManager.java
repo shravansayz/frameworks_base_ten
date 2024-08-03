@@ -45,6 +45,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController;
 import com.android.systemui.statusbar.policy.ConfigurationController.ConfigurationListener;
 import com.android.systemui.statusbar.policy.HeadsUpManager;
 import com.android.systemui.statusbar.policy.OnHeadsUpChangedListener;
+import com.android.systemui.statusbar.tenx.StatusbarUtils;
 import com.android.systemui.util.kotlin.JavaAdapter;
 
 import java.io.PrintWriter;
@@ -203,7 +204,11 @@ public final class StatusBarTouchableRegionManager implements Dumpable {
         Resources resources = mContext.getResources();
         mDisplayCutoutTouchableRegionSize = resources.getDimensionPixelSize(
                 com.android.internal.R.dimen.display_cutout_touchable_region_size);
-        mStatusBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+        int defaultHeightValue = resources.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
+        mStatusBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                           SystemBarUtils.getStatusBarHeight(mContext) :
+                           StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(
+                                   mContext, defaultHeightValue), mContext);
     }
 
     /**

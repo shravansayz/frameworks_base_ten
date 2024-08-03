@@ -55,6 +55,7 @@ import com.android.systemui.shared.rotation.RotationButtonController;
 import com.android.systemui.statusbar.CommandQueue;
 import com.android.systemui.statusbar.CommandQueue.Callbacks;
 import com.android.systemui.statusbar.phone.userswitcher.StatusBarUserSwitcherContainer;
+import com.android.systemui.statusbar.tenx.StatusbarUtils;
 import com.android.systemui.statusbar.window.StatusBarWindowController;
 import com.android.systemui.user.ui.binder.StatusBarUserChipViewBinder;
 import com.android.systemui.user.ui.viewmodel.StatusBarUserChipViewModel;
@@ -321,7 +322,11 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
         final int waterfallTopInset =
                 mDisplayCutout == null ? 0 : mDisplayCutout.getWaterfallInsets().top;
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
-        mStatusBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+        int defaultHeightValue = getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
+        mStatusBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                           SystemBarUtils.getStatusBarHeight(mContext) :
+                           StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(
+                                   mContext, defaultHeightValue), mContext);
         layoutParams.height = mStatusBarHeight - waterfallTopInset;
         updateSystemIconsContainerHeight();
         updatePaddings();
@@ -340,13 +345,32 @@ public class PhoneStatusBarView extends FrameLayout implements Callbacks {
     }
 
     private void updatePaddings() {
-        int statusBarPaddingStart = getResources().getDimensionPixelSize(
-                R.dimen.status_bar_padding_start);
+        int statusBarPaddingStart;
+        if (!StatusbarUtils.useCustomStatusbarPaddingStart(mContext)) {
+            statusBarPaddingStart = getResources().getDimensionPixelSize(
+                    R.dimen.status_bar_padding_start);
+        } else {
+            statusBarPaddingStart = StatusbarUtils.dpToPixels(
+                    StatusbarUtils.getCustomStatusBarPaddingStart(
+                    mContext, getResources().getDimensionPixelSize(
+                            R.dimen.status_bar_padding_start)), mContext);
+        }
+
+        int statusBarPaddingEnd;
+        if (!StatusbarUtils.useCustomStatusBarPaddingEnd(mContext)) {
+            statusBarPaddingEnd = getResources().getDimensionPixelSize(
+                    R.dimen.status_bar_padding_end);
+        } else {
+            statusBarPaddingEnd = StatusbarUtils.dpToPixels(
+                    StatusbarUtils.getCustomStatusBarPaddingEnd(
+                    mContext, getResources().getDimensionPixelSize(
+                            R.dimen.status_bar_padding_end)), mContext);
+        }
 
         findViewById(R.id.status_bar_contents).setPaddingRelative(
                 statusBarPaddingStart,
                 getResources().getDimensionPixelSize(R.dimen.status_bar_padding_top),
-                getResources().getDimensionPixelSize(R.dimen.status_bar_padding_end),
+                statusBarPaddingEnd,
                 0);
 
         findViewById(R.id.notification_lights_out)

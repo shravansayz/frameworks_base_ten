@@ -55,6 +55,7 @@ import com.android.systemui.fragments.FragmentHostManager;
 import com.android.systemui.fragments.FragmentService;
 import com.android.systemui.res.R;
 import com.android.systemui.statusbar.phone.StatusBarContentInsetsProvider;
+import com.android.systemui.statusbar.tenx.StatusbarUtils;
 import com.android.systemui.unfold.UnfoldTransitionProgressProvider;
 import com.android.systemui.unfold.util.JankMonitorTransitionProgressListener;
 
@@ -108,7 +109,12 @@ public class StatusBarWindowController {
         mLpChanged = new WindowManager.LayoutParams();
 
         if (mBarHeight < 0) {
-            mBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+                int defaultHeightValue = mContext.getResources().getDimensionPixelSize(
+                        com.android.internal.R.dimen.status_bar_height);
+                mBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                             SystemBarUtils.getStatusBarHeight(mContext) :
+                             StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(
+                                     mContext, defaultHeightValue), mContext);
         }
         unfoldTransitionProgressProvider.ifPresent(
                 unfoldProgressProvider -> unfoldProgressProvider.addCallback(
@@ -127,7 +133,11 @@ public class StatusBarWindowController {
     public void refreshStatusBarHeight() {
         Trace.beginSection("StatusBarWindowController#refreshStatusBarHeight");
         try {
-            int heightFromConfig = SystemBarUtils.getStatusBarHeight(mContext);
+            int defaultHeightValue = mContext.getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
+            int heightFromConfig = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                                   SystemBarUtils.getStatusBarHeight(mContext) :
+                                   StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(
+                                           mContext, defaultHeightValue), mContext);
 
             if (mBarHeight != heightFromConfig) {
                 mBarHeight = heightFromConfig;

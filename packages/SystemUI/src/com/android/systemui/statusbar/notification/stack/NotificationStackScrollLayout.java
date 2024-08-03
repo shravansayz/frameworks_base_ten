@@ -124,6 +124,7 @@ import com.android.systemui.statusbar.policy.ConfigurationController.Configurati
 import com.android.systemui.statusbar.policy.HeadsUpUtil;
 import com.android.systemui.statusbar.policy.ScrollAdapter;
 import com.android.systemui.statusbar.policy.SplitShadeStateController;
+import com.android.systemui.statusbar.tenx.StatusbarUtils;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.util.Assert;
 import com.android.systemui.util.ColorUtilKt;
@@ -598,6 +599,7 @@ public class NotificationStackScrollLayout extends ViewGroup implements Dumpable
     @Nullable private SplitShadeStateController mSplitShadeStateController = null;
     private boolean mIsSmallLandscapeLockscreenEnabled = false;
     private boolean mShowDimissButton;
+    private int mDefaultStatusbarHeightValue;
 
     /** Pass splitShadeStateController to view and update split shade */
     public void passSplitShadeStateController(SplitShadeStateController splitShadeStateController) {
@@ -680,6 +682,7 @@ public class NotificationStackScrollLayout extends ViewGroup implements Dumpable
                 com.android.internal.R.attr.materialColorSurfaceContainerHigh).getDefaultColor();
         int minHeight = res.getDimensionPixelSize(R.dimen.notification_min_height);
         int maxHeight = res.getDimensionPixelSize(R.dimen.notification_max_height);
+        mDefaultStatusbarHeightValue = getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
         mSplitShadeMinContentHeight = res.getDimensionPixelSize(
                 R.dimen.nssl_split_shade_min_content_height);
         mExpandHelper = new ExpandHelper(getContext(), mExpandHelperCallback,
@@ -1139,7 +1142,9 @@ public class NotificationStackScrollLayout extends ViewGroup implements Dumpable
                 res.getDimensionPixelSize(R.dimen.notification_divider_height));
         mMinTopOverScrollToEscape = res.getDimensionPixelSize(
                 R.dimen.min_top_overscroll_to_qs);
-        mStatusBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+        mStatusBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                           SystemBarUtils.getStatusBarHeight(mContext) :
+                           StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(mContext, mDefaultStatusbarHeightValue), mContext);
         mBottomPadding = res.getDimensionPixelSize(R.dimen.notification_panel_padding_bottom);
         mMinimumPaddings = res.getDimensionPixelSize(R.dimen.notification_side_paddings);
         mQsTilePadding = res.getDimensionPixelOffset(R.dimen.qs_tile_margin_horizontal);
@@ -2068,7 +2073,9 @@ public class NotificationStackScrollLayout extends ViewGroup implements Dumpable
         super.onConfigurationChanged(newConfig);
         Resources res = getResources();
         updateSplitNotificationShade();
-        mStatusBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+        mStatusBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                           SystemBarUtils.getStatusBarHeight(mContext) :
+                           StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(mContext, mDefaultStatusbarHeightValue), mContext);
         float densityScale = res.getDisplayMetrics().density;
         mSwipeHelper.setDensityScale(densityScale);
         float pagingTouchSlop = ViewConfiguration.get(getContext()).getScaledPagingTouchSlop();

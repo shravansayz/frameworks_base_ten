@@ -58,6 +58,7 @@ import com.android.systemui.statusbar.notification.stack.NotificationStackScroll
 import com.android.systemui.statusbar.notification.stack.StackScrollAlgorithm;
 import com.android.systemui.statusbar.notification.stack.ViewState;
 import com.android.systemui.statusbar.phone.NotificationIconContainer;
+import com.android.systemui.statusbar.tenx.StatusbarUtils;
 import com.android.systemui.util.DumpUtilsKt;
 
 import java.io.PrintWriter;
@@ -137,7 +138,10 @@ public class NotificationShelf extends ActivatableNotificationView {
 
     private void updateResources() {
         Resources res = getResources();
-        mStatusBarHeight = SystemBarUtils.getStatusBarHeight(mContext);
+            int defaultHeightValue = getResources().getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
+            mStatusBarHeight = !StatusbarUtils.useCustomStatusBarHeight(mContext) ?
+                               SystemBarUtils.getStatusBarHeight(mContext) :
+                               StatusbarUtils.dpToPixels(StatusbarUtils.getCustomStatusBarHeight(mContext, defaultHeightValue), mContext);
         mPaddingBetweenElements = res.getDimensionPixelSize(R.dimen.notification_divider_height);
         mMaxIconsOnLockscreen = res.getInteger(R.integer.max_notif_icons_on_lockscreen);
 
