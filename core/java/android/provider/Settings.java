@@ -6376,6 +6376,12 @@ public final class Settings {
         public static final String STATUSBAR_BATTERY_BAR_USE_GRADIENT_COLOR = "statusbar_battery_bar_use_gradient_color";
 
         /**
+         * Battery bar charging animation color
+         * @hide
+         */
+        public static final String STATUSBAR_BATTERY_BAR_ANIMATE_COLOR = "statusbar_battery_bar_animate_color";
+
+        /**
          * @hide
          */
         public static final String QS_BATTERY_STYLE = "qs_battery_style";
