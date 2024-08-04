@@ -6796,6 +6796,13 @@ public final class Settings {
         public static final String CUSTOM_STATUSBAR_HEIGHT = "custom_statusbar_height";
 
         /**
+         * Dual statusbar mod
+         *
+         * @hide
+         */
+        public static final String USE_DUAL_STATUSBAR_MOD = "use_dual_statusbar_mod";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
