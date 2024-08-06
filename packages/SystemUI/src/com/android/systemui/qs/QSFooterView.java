@@ -28,6 +28,7 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.net.TrafficStats;
 import android.os.Build;
 import android.os.Handler;
 import android.os.UserHandle;
@@ -39,7 +40,9 @@ import android.text.format.Formatter;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -62,6 +65,8 @@ public class QSFooterView extends FrameLayout {
     private View mEditButton;
     private Drawable mIcon;
 
+    private LinearLayout mDataUsagePanel;
+
     @Nullable
     protected TouchAnimator mFooterAnimator;
 
@@ -72,6 +77,8 @@ public class QSFooterView extends FrameLayout {
     private boolean mShouldShowDataUsage;
     private boolean mShouldShowDataUsageIcon;
     private boolean mShouldShowUsageText;
+
+    private final Handler mHandler = new Handler();
 
     @Nullable
     private OnClickListener mExpandClickListener;
@@ -97,6 +104,7 @@ public class QSFooterView extends FrameLayout {
         mPageIndicator = findViewById(R.id.footer_page_indicator);
         mUsageText = findViewById(R.id.build);
         mEditButton = findViewById(android.R.id.edit);
+        mDataUsagePanel = findViewById(R.id.qs_data_usage);
 
         updateResources();
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -111,6 +119,10 @@ public class QSFooterView extends FrameLayout {
                 mUsageText.setSelected(false);
                 postDelayed(() -> mUsageText.setSelected(true), 1000);
             }
+        });
+
+        mHandler.post(() -> {
+            getInternetUsage();
         });
     }
 
@@ -222,6 +234,37 @@ public class QSFooterView extends FrameLayout {
         }
     }
 
+    private void getInternetUsage() {
+        TextView internetUp = findViewById(R.id.internet_up);
+        TextView internetDown = findViewById(R.id.internet_down);
+        TextView mobileUp = findViewById(R.id.mobile_up);
+        TextView mobileDown = findViewById(R.id.mobile_down);
+        TextView wifiUp = findViewById(R.id.wifi_up);
+        TextView wifiDown = findViewById(R.id.wifi_down);
+
+        long mobileUpload = TrafficStats.getMobileTxBytes();
+        long mobileDownload = TrafficStats.getMobileRxBytes();
+
+        long totalDownload = TrafficStats.getTotalRxBytes();
+        long totalUpload = TrafficStats.getTotalTxBytes();
+
+        long wifiUpload = totalUpload - mobileUpload;
+        long wifiDownload = totalDownload - mobileDownload;
+
+        internetDown.setText("Download: " + BytesToMb(totalDownload) + "MB");
+        internetUp.setText("Upload: " + BytesToMb(totalUpload) + "MB");
+
+        mobileDown.setText("Download: " + BytesToMb(mobileDownload) + "MB");
+        mobileUp.setText("Upload: " + BytesToMb(mobileUpload) + "MB");
+
+        wifiDown.setText("Download: " + BytesToMb(wifiDownload) + "MB");
+        wifiUp.setText("Upload: " + BytesToMb(wifiUpload) + "MB");
+    }
+
+    public long BytesToMb(long usage) {
+        return usage / 1048567;
+    }
+
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -233,7 +276,9 @@ public class QSFooterView extends FrameLayout {
         updateEditButtonResources();
         updateBuildTextResources();
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
-        lp.height = getResources().getDimensionPixelSize(R.dimen.qs_footer_height);
+        lp.height = !showUsagePanel() ?
+                getResources().getDimensionPixelSize(R.dimen.qs_footer_height) :
+                ViewGroup.LayoutParams.WRAP_CONTENT;
         int sideMargin = getResources().getDimensionPixelSize(R.dimen.qs_footer_margin);
         lp.leftMargin = sideMargin;
         lp.rightMargin = sideMargin;
@@ -265,6 +310,7 @@ public class QSFooterView extends FrameLayout {
                 .addFloat(mPageIndicator, "alpha", 0, 1)
                 .addFloat(mUsageText, "alpha", 0, 1)
                 .addFloat(mEditButton, "alpha", 0, 1)
+                .addFloat(mDataUsagePanel, "alpha", 0, 1)
                 .setStartDelay(0.9f);
         return builder.build();
     }
@@ -314,6 +360,12 @@ public class QSFooterView extends FrameLayout {
         });
     }
 
+    private boolean showUsagePanel() {
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.QS_DATA_USAGE_PANEL, 0,
+                UserHandle.USER_CURRENT) == 1;
+    }
+
     private void updateVisibilities() {
         mUsageText.setVisibility(mShouldShowDataUsage && mExpanded && mShouldShowUsageText
                 ? View.VISIBLE : View.INVISIBLE);
@@ -322,6 +374,13 @@ public class QSFooterView extends FrameLayout {
             mUsageText.setCompoundDrawablesWithIntrinsicBounds(mIcon, null, null, null);
         } else {
             mUsageText.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        }
+
+        if (mExpanded && showUsagePanel()) {
+            mDataUsagePanel.setVisibility(View.VISIBLE);
+            getInternetUsage();
+        } else {
+            mDataUsagePanel.setVisibility(View.GONE);
         }
     }
 }
