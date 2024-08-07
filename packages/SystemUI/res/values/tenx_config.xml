@@ -25,4 +25,12 @@
     <!-- Whether to pulse onFingerDown actions instead
         of waking the screen while the screen is off or in lpm. -->
     <bool name="config_pulseOnFingerDown">false</bool>
+
+    <!-- System info -->
+    <string name="config_sysCPUTemp">/sys/class/thermal/thermal_zone0/temp</string>
+    <string name="config_sysBatteryTemp">/sys/class/power_supply/battery/temp</string>
+    <string name="config_sysGPUFreq">/sys/kernel/gpu/gpu_busy</string>
+    <string name="config_sysGPULoad">/sys/kernel/gpu/gpu_clock</string>
+    <integer name="config_sysCPUTempMultiplier">1000</integer>
+    <integer name="config_sysBatteryTempMultiplier">10</integer>
 </resources>

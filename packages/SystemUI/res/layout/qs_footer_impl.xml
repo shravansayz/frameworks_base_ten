@@ -91,6 +91,17 @@
             android:id="@+id/qs_data_usage"
             android:visibility="visible" />
 
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:background="@*android:color/transparent"
+            android:visibility="gone" />
+
+        <include layout="@layout/system_info"
+            android:id="@+id/system_info"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </com.android.systemui.qs.QSFooterView>

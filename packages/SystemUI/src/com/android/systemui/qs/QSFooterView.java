@@ -48,6 +48,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
+import com.android.systemui.qs.tenx.SystemInfoUtils;
+
 import com.android.settingslib.development.DevelopmentSettingsEnabler;
 import com.android.settingslib.net.DataUsageController;
 import com.android.systemui.FontSizeUtils;
@@ -63,9 +65,11 @@ public class QSFooterView extends FrameLayout {
     private PageIndicator mPageIndicator;
     private TextView mUsageText;
     private View mEditButton;
+    private View mView;
     private Drawable mIcon;
 
     private LinearLayout mDataUsagePanel;
+    private LinearLayout mSystemInfo;
 
     @Nullable
     protected TouchAnimator mFooterAnimator;
@@ -105,6 +109,8 @@ public class QSFooterView extends FrameLayout {
         mUsageText = findViewById(R.id.build);
         mEditButton = findViewById(android.R.id.edit);
         mDataUsagePanel = findViewById(R.id.qs_data_usage);
+        mSystemInfo = findViewById(R.id.system_info);
+        mView = findViewById(R.id.view);
 
         updateResources();
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -265,6 +271,48 @@ public class QSFooterView extends FrameLayout {
         return usage / 1048567;
     }
 
+    private void setSystemInfo(Context context) {
+        TextView batteryTemp = findViewById(R.id.battery_temp);
+        TextView cpuTemp = findViewById(R.id.cpu_temp);
+        TextView gpuClock = findViewById(R.id.gpu_clock);
+        TextView gpuBusy = findViewById(R.id.gpu_busy);
+
+        String sysBatTemp = context.getResources().getString(
+                R.string.config_sysBatteryTemp);
+        String sysCPUTemp = context.getResources().getString(
+                R.string.config_sysCPUTemp);
+        String sysGPULoad = context.getResources().getString(
+                R.string.config_sysGPULoad);
+        String sysGPUFreq = context.getResources().getString(
+                R.string.config_sysGPUFreq);
+        int sysCPUTempMultiplier = context.getResources().getInteger(
+                R.integer.config_sysCPUTempMultiplier);
+        int sysBatTempMultiplier = context.getResources().getInteger(
+                R.integer.config_sysBatteryTempMultiplier);
+        int defaultMultiplier = 1;
+
+        String batteryTempText = SystemInfoUtils.getSystemInfo(sysBatTemp, sysBatTempMultiplier, " ℃", true);
+        String cpuTemperatureText = SystemInfoUtils.getSystemInfo(sysCPUTemp, sysCPUTempMultiplier, " ℃", true);
+        String gpuClockText = SystemInfoUtils.getSystemInfo(sysGPULoad, defaultMultiplier, " MHz", true);
+        String gpuBusyText = SystemInfoUtils.getSystemInfo(sysGPUFreq, defaultMultiplier, "", false);
+
+        if (batteryTempText != null) {
+            batteryTemp.setText(batteryTempText);
+        }
+
+        if (cpuTemperatureText != null) {
+            cpuTemp.setText(cpuTemperatureText);
+        }
+
+        if (gpuClockText != null) {
+            gpuClock.setText(gpuClockText);
+        }
+
+        if (gpuBusyText != null) {
+            gpuBusy.setText(gpuBusyText);
+        }
+    }
+
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -276,9 +324,9 @@ public class QSFooterView extends FrameLayout {
         updateEditButtonResources();
         updateBuildTextResources();
         MarginLayoutParams lp = (MarginLayoutParams) getLayoutParams();
-        lp.height = !showUsagePanel() ?
-                getResources().getDimensionPixelSize(R.dimen.qs_footer_height) :
-                ViewGroup.LayoutParams.WRAP_CONTENT;
+        lp.height = !showUsagePanel()
+                    ? getResources().getDimensionPixelSize(R.dimen.qs_footer_height)
+                    : ViewGroup.LayoutParams.WRAP_CONTENT;
         int sideMargin = getResources().getDimensionPixelSize(R.dimen.qs_footer_margin);
         lp.leftMargin = sideMargin;
         lp.rightMargin = sideMargin;
@@ -311,6 +359,7 @@ public class QSFooterView extends FrameLayout {
                 .addFloat(mUsageText, "alpha", 0, 1)
                 .addFloat(mEditButton, "alpha", 0, 1)
                 .addFloat(mDataUsagePanel, "alpha", 0, 1)
+                .addFloat(mSystemInfo, "alpha", 0, 1)
                 .setStartDelay(0.9f);
         return builder.build();
     }
@@ -366,6 +415,12 @@ public class QSFooterView extends FrameLayout {
                 UserHandle.USER_CURRENT) == 1;
     }
 
+    private boolean showSystemInfo() {
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.QS_SYSTEM_INFO, 0,
+                UserHandle.USER_CURRENT) == 1;
+    }
+
     private void updateVisibilities() {
         mUsageText.setVisibility(mShouldShowDataUsage && mExpanded && mShouldShowUsageText
                 ? View.VISIBLE : View.INVISIBLE);
@@ -381,6 +436,19 @@ public class QSFooterView extends FrameLayout {
             getInternetUsage();
         } else {
             mDataUsagePanel.setVisibility(View.GONE);
+        }
+
+        if (mExpanded && showSystemInfo()) {
+            mSystemInfo.setVisibility(View.VISIBLE);
+            setSystemInfo(mContext);
+        } else {
+            mSystemInfo.setVisibility(View.GONE);
+        }
+
+        if (mExpanded && (showUsagePanel() && showSystemInfo())) {
+            mView.setVisibility(View.VISIBLE);
+        } else {
+            mView.setVisibility(View.GONE);
         }
     }
 }
