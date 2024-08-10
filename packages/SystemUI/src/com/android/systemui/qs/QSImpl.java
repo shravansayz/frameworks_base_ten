@@ -734,6 +734,8 @@ public class QSImpl implements QS, CommandQueue.Callbacks, StatusBarStateControl
         int heightDiff = getHeightDiff();
         float panelTranslationY = translationScaleY * heightDiff;
 
+        mHeader.setExpansion(onKeyguardAndExpanded, expansion, panelTranslationY);
+
         if (expansion < 1 && expansion > 0.99) {
             if (mQuickQSPanelController.switchTileLayout(false)) {
                 mHeader.updateResources();

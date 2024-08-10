@@ -17,6 +17,7 @@
 package com.android.systemui.qs;
 
 import com.android.systemui.qs.dagger.QSScope;
+import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.scene.shared.flag.SceneContainerFlags;
 import com.android.systemui.util.ViewController;
 
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 @QSScope
 class QuickStatusBarHeaderController extends ViewController<QuickStatusBarHeader> {
 
+    private final ActivityStarter mActivityStarter;
     private final QuickQSPanelController mQuickQSPanelController;
     private boolean mListening;
     private final boolean mSceneContainerEnabled;
@@ -35,15 +37,19 @@ class QuickStatusBarHeaderController extends ViewController<QuickStatusBarHeader
     @Inject
     QuickStatusBarHeaderController(QuickStatusBarHeader view,
             QuickQSPanelController quickQSPanelController,
-            SceneContainerFlags sceneContainerFlags
+            SceneContainerFlags sceneContainerFlags,
+            ActivityStarter activityStarter
     ) {
         super(view);
         mQuickQSPanelController = quickQSPanelController;
         mSceneContainerEnabled = sceneContainerFlags.isEnabled();
+        mActivityStarter = activityStarter;
     }
+
     @Override
     protected void onViewAttached() {
         mView.setSceneContainerEnabled(mSceneContainerEnabled);
+        mView.setActivityStarter(mActivityStarter);
     }
 
     @Override

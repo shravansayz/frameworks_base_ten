@@ -65,17 +65,65 @@
 
     </com.bosphere.fadingedgelayout.FadingEdgeLayout>
 
-    <com.android.systemui.qs.QuickQSPanel
-        android:id="@+id/quick_qs_panel"
+    <RelativeLayout
+        android:id="@+id/qs_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/qqs_layout_margin_top"
+        android:layout_gravity="top"
         android:clipChildren="false"
-        android:clipToPadding="false"
-        android:focusable="true"
-        android:paddingTop="@dimen/custom_qs_panel_padding_top"
-        android:paddingBottom="@dimen/qqs_layout_padding_bottom"
-        android:importantForAccessibility="no">
-    </com.android.systemui.qs.QuickQSPanel>
+        android:clipToPadding="false">
 
+        <com.android.systemui.qs.QuickQSPanel
+            android:id="@+id/quick_qs_panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:focusable="true"
+            android:paddingBottom="@dimen/qqs_layout_padding_bottom"
+            android:importantForAccessibility="no">
+        </com.android.systemui.qs.QuickQSPanel>
+
+        <RelativeLayout
+            android:id="@+id/quick_qs_panel_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_below="@id/quick_qs_panel">
+
+            <TextView
+                android:id="@+id/quick_qs_panel_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:text="@string/tenx_text"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/quick_qs_panel_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="7dp"
+                android:background="@drawable/quick_qs_settings_background"
+                android:layout_below="@id/quick_qs_panel"
+                android:src="@drawable/ic_quick_qs_panel_settings" />
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/quick_qs_panel_background_view"
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:layout_marginTop="1dp"
+            android:layout_below="@id/quick_qs_panel_items"
+            android:background="@drawable/quick_qs_panel_background" />
+
+    </RelativeLayout>
 </com.android.systemui.qs.QuickStatusBarHeader>

@@ -6815,6 +6815,24 @@ public final class Settings {
         public static final String QS_SYSTEM_INFO = "qs_system_info";
 
         /**
+         * Quick QS settings
+         * @hide
+         */
+        public static final String QUICK_QS_SHOW_SETTINGS = "quick_qs_show_settings";
+
+        /**
+         * Quick QS tenx text
+         * @hide
+         */
+        public static final String QUICK_QS_SHOW_TENX_TEXT = "quick_qs_show_tenx_text";
+
+        /**
+         * Quick QS show background view
+         * @hide
+         */
+        public static final String QUICK_QS_SHOW_VIEW = "quick_qs_show_view";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *

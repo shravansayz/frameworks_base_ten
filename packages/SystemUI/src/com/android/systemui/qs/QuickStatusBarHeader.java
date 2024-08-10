@@ -19,6 +19,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 import android.content.Context;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
@@ -34,10 +35,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
+import com.android.systemui.Dependency;
+import com.android.systemui.plugins.ActivityStarter;
 import com.android.systemui.res.R;
 import com.android.systemui.tenx.header.StatusBarHeaderMachine;
 import com.android.systemui.util.LargeScreenUtils;
+import com.android.systemui.qs.TouchAnimator;
+import com.android.systemui.qs.TouchAnimator.Builder;
 
 import com.bosphere.fadingedgelayout.FadingEdgeLayout;
 
@@ -50,6 +57,8 @@ import java.lang.Math;
 public class QuickStatusBarHeader extends FrameLayout
             implements StatusBarHeaderMachine.IStatusBarHeaderMachineObserver {
 
+    private ActivityStarter mActivityStarter;
+
     private boolean mExpanded;
     private boolean mQsDisabled;
 
@@ -57,10 +66,19 @@ public class QuickStatusBarHeader extends FrameLayout
 
     private boolean mSceneContainerEnabled;
 
+    public TouchAnimator mQQSContainerAnimator;
+
+    private ImageButton mQuickQsPanelSettings;
+    private TextView mQuickQsPanelText;
+    private View mQuickQsPanelBackground;
+
     // QS Header
     private ImageView mQsHeaderImageView;
     private FadingEdgeLayout mQsHeaderLayout;
     private boolean mHeaderImageEnabled;
+    private boolean mShowSettings;
+    private boolean mShowTenXText;
+    private boolean mShowView;
     private StatusBarHeaderMachine mStatusBarHeaderMachine;
     private Drawable mCurrentBackground;
     private int mHeaderImageHeight;
@@ -78,6 +96,15 @@ public class QuickStatusBarHeader extends FrameLayout
                     this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CUSTOM_HEADER_HEIGHT), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QUICK_QS_SHOW_SETTINGS), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QUICK_QS_SHOW_TENX_TEXT), false,
+                    this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QUICK_QS_SHOW_VIEW), false,
                     this, UserHandle.USER_ALL);
             }
 
@@ -101,6 +128,9 @@ public class QuickStatusBarHeader extends FrameLayout
 
         mQsHeaderLayout = findViewById(R.id.layout_header);
         mQsHeaderImageView = findViewById(R.id.qs_header_image_view);
+        mQuickQsPanelSettings = findViewById(R.id.quick_qs_panel_settings);
+        mQuickQsPanelText = findViewById(R.id.quick_qs_panel_text);
+        mQuickQsPanelBackground = findViewById(R.id.quick_qs_panel_background_view);
         mQsHeaderImageView.setClipToOutline(true);
 
         updateSettings();
@@ -169,6 +199,12 @@ public class QuickStatusBarHeader extends FrameLayout
 
         mHeaderQsPanel.setLayoutParams(qqsLP);
 
+        TouchAnimator.Builder touchAnimatorBuilder = new TouchAnimator.Builder()
+            .addFloat(mQuickQsPanelBackground, "alpha", 1f, 0f)
+            .addFloat(mQuickQsPanelSettings, "alpha", 1f, 0f)
+            .addFloat(mQuickQsPanelText, "alpha", 1f, 0f);
+        mQQSContainerAnimator = touchAnimatorBuilder.build();
+
         Configuration config = mContext.getResources().getConfiguration();
         if (config.orientation != Configuration.ORIENTATION_LANDSCAPE) {
             mQsHeaderLayout.setVisibility(mHeaderImageEnabled ? View.VISIBLE : View.GONE);
@@ -181,6 +217,13 @@ public class QuickStatusBarHeader extends FrameLayout
         if (mExpanded == expanded) return;
         mExpanded = expanded;
         quickQSPanelController.setExpanded(expanded);
+    }
+
+    public void setExpansion(boolean forceExpanded, float expansionFraction, float panelTranslationY) {
+        if (mQQSContainerAnimator != null) {
+            mQQSContainerAnimator.setPosition(forceExpanded ? 1f : expansionFraction);
+        }
+        setAlpha(forceExpanded ? expansionFraction : 1);
     }
 
     public void disable(int state1, int state2, boolean animate) {
@@ -197,6 +240,7 @@ public class QuickStatusBarHeader extends FrameLayout
                 UserHandle.USER_CURRENT) == 1;
         updateHeaderImage();
         updateResources();
+        updatePanelItems();
     }
 
     private void setContentMargins(View view, int marginStart, int marginEnd) {
@@ -296,5 +340,38 @@ public class QuickStatusBarHeader extends FrameLayout
         // Set the image fade size (it has to be a 55,5% related to the main size)
         mQsHeaderLayout.setFadeSizes(0,0,(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 
             bottomFadeSize, getContext().getResources().getDisplayMetrics()), 0);
+    }
+
+    private void updatePanelItems() {
+        mShowSettings = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.QUICK_QS_SHOW_SETTINGS, 0,
+                UserHandle.USER_CURRENT) == 1;
+        mShowTenXText = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.QUICK_QS_SHOW_TENX_TEXT, 0,
+                UserHandle.USER_CURRENT) == 1;
+        mShowView = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.QUICK_QS_SHOW_VIEW, 0,
+                UserHandle.USER_CURRENT) == 1;
+
+        mQuickQsPanelSettings.setVisibility(mShowSettings ? View.VISIBLE : View.GONE);
+        mQuickQsPanelText.setVisibility(mShowTenXText ? View.VISIBLE : View.GONE);
+        mQuickQsPanelBackground.setVisibility(mShowView ? View.VISIBLE : View.GONE);
+
+        if (mQuickQsPanelSettings != null) {
+            mQuickQsPanelSettings.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                   startSettingsActivity();
+                }
+            });
+        }
+    }
+
+    private void startSettingsActivity() {
+        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+        mActivityStarter.startActivity(intent, true /* dismissShade */);
+    }
+
+    public void setActivityStarter(ActivityStarter activityStarter) {
+        mActivityStarter = activityStarter;
     }
 }

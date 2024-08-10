@@ -87,4 +87,7 @@
     <string name="gpu_title">GPU</string>
     <string name="clock_title">Clock</string>
     <string name="utilisation_title">Utilisation</string>
+
+    <!-- Quick QS panel items -->
+    <string name="tenx_text">#TenX-OS</string>
 </resources>
