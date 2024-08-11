@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.systemui.Dependency;
@@ -47,6 +48,8 @@ import com.android.systemui.qs.TouchAnimator;
 import com.android.systemui.qs.TouchAnimator.Builder;
 
 import com.bosphere.fadingedgelayout.FadingEdgeLayout;
+
+import lineageos.providers.LineageSettings;
 
 import java.lang.Math;
 
@@ -71,6 +74,7 @@ public class QuickStatusBarHeader extends FrameLayout
     private ImageButton mQuickQsPanelSettings;
     private TextView mQuickQsPanelText;
     private View mQuickQsPanelBackground;
+    private View mQuickQsPanelDivider;
 
     // QS Header
     private ImageView mQsHeaderImageView;
@@ -131,6 +135,7 @@ public class QuickStatusBarHeader extends FrameLayout
         mQuickQsPanelSettings = findViewById(R.id.quick_qs_panel_settings);
         mQuickQsPanelText = findViewById(R.id.quick_qs_panel_text);
         mQuickQsPanelBackground = findViewById(R.id.quick_qs_panel_background_view);
+        mQuickQsPanelDivider = findViewById(R.id.quick_qs_panel_divider_view);
         mQsHeaderImageView.setClipToOutline(true);
 
         updateSettings();
@@ -352,10 +357,29 @@ public class QuickStatusBarHeader extends FrameLayout
         mShowView = Settings.System.getIntForUser(getContext().getContentResolver(),
                 Settings.System.QUICK_QS_SHOW_VIEW, 0,
                 UserHandle.USER_CURRENT) == 1;
+        boolean isBlackMode = LineageSettings.Secure.getIntForUser(getContext().getContentResolver(),
+                LineageSettings.Secure.BERRY_BLACK_THEME, 0,
+                UserHandle.USER_CURRENT) == 1;
 
         mQuickQsPanelSettings.setVisibility(mShowSettings ? View.VISIBLE : View.GONE);
         mQuickQsPanelText.setVisibility(mShowTenXText ? View.VISIBLE : View.GONE);
         mQuickQsPanelBackground.setVisibility(mShowView ? View.VISIBLE : View.GONE);
+
+        RelativeLayout.LayoutParams qqsDividerParams = (RelativeLayout.LayoutParams) mQuickQsPanelDivider.getLayoutParams();
+
+        if (qqsDividerParams != null ) {
+            if (mShowSettings && mShowTenXText && mShowView && !isBlackMode) {
+                mQuickQsPanelDivider.setVisibility(View.VISIBLE);
+                qqsDividerParams.addRule(RelativeLayout.BELOW, R.id.quick_qs_panel_background_view);
+            } else if (mShowSettings && mShowTenXText && !isBlackMode) {
+                mQuickQsPanelDivider.setVisibility(View.VISIBLE);
+                qqsDividerParams.addRule(RelativeLayout.BELOW, R.id.quick_qs_panel_items);
+            } else {
+                mQuickQsPanelDivider.setVisibility(View.GONE);
+            }
+
+            mQuickQsPanelDivider.setLayoutParams(qqsDividerParams);
+        }
 
         if (mQuickQsPanelSettings != null) {
             mQuickQsPanelSettings.setOnClickListener(new View.OnClickListener() {

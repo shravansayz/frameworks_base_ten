@@ -123,7 +123,15 @@
             android:layout_height="18dp"
             android:layout_marginTop="1dp"
             android:layout_below="@id/quick_qs_panel_items"
+            android:visibility="gone"
             android:background="@drawable/quick_qs_panel_background" />
+
+        <View
+            android:id="@+id/quick_qs_panel_divider_view"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:visibility="gone"
+            android:background="@*android:color/transparent" />
 
     </RelativeLayout>
 </com.android.systemui.qs.QuickStatusBarHeader>
