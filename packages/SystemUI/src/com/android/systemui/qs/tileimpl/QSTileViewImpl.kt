@@ -113,6 +113,11 @@ open class QSTileViewImpl @JvmOverloads constructor(
             Settings.System.QS_TILE_UI_STYLE, 0, UserHandle.USER_CURRENT
         ) != 0
 
+    private val getAccurateShade: Boolean = Settings.System.getIntForUser(
+            context.contentResolver,
+            Settings.System.MONET_ACCURATE_SHADE, 0, UserHandle.USER_CURRENT
+        ) != 0
+
     private val colorActive = Utils.getColorAttrDefaultColor(context, R.attr.shadeActive)
     private val colorOffstate = Utils.getColorAttrDefaultColor(context, R.attr.shadeInactive) 
     private val colorInactive = if (isA11Style) Utils.applyAlpha(INACTIVE_ALPHA, colorOffstate)
@@ -153,6 +158,8 @@ open class QSTileViewImpl @JvmOverloads constructor(
 
     private val gradientStartColor = resources.getColor(R.color.holo_blue_light)
     private val gradientEndColor = resources.getColor(R.color.holo_green_light)
+
+    private val accurateShade = resources.getColor(R.color.monet_accurate_shade_system);
 
     private lateinit var iconContainer: LinearLayout
     private lateinit var label: TextView
@@ -997,7 +1004,10 @@ open class QSTileViewImpl @JvmOverloads constructor(
                 else if (defaultQsTileStyles == 7)
                     Utils.applyAlpha(0.1f, colorActive)
                 else
-                    colorActive
+                    if (!getAccurateShade)
+                        colorActive
+                    else
+                       accurateShade
             state == Tile.STATE_INACTIVE ->
                 if (defaultQsTileStyles == 4 ||
                         defaultQsTileStyles == 7)

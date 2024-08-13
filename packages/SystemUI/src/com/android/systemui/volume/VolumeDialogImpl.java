@@ -80,6 +80,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.Trace;
+import android.os.UserHandle;
 import android.os.VibrationEffect;
 import android.provider.Settings;
 import android.provider.Settings.Global;
@@ -2369,6 +2370,9 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
     }
 
     private void updateVolumeRowTintH(VolumeRow row, boolean isActive) {
+        boolean isMonetAccurateShade = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.MONET_ACCURATE_SHADE, 0, UserHandle.USER_CURRENT) != 0;
+
         if (isActive) {
             row.slider.requestFocus();
         }
@@ -2389,7 +2393,11 @@ public class VolumeDialogImpl implements VolumeDialog, Dumpable,
         final ColorStateList inverseTextTint = Utils.getColorAttr(
                 mContext, com.android.internal.R.attr.textColorOnAccent);
 
-        row.sliderProgressSolid.setTintList(colorTint);
+        row.sliderProgressSolid.setTintList(
+            !isMonetAccurateShade
+                    ? colorTint
+                    : ColorStateList.valueOf(mContext.getResources().getColor(R.color.monet_accurate_shade_system))
+        );
         if (row.sliderProgressIcon != null) {
             row.sliderProgressIcon.setTintList(bgTint);
         }

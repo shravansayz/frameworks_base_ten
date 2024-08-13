@@ -6845,6 +6845,12 @@ public final class Settings {
         public static final String QUICK_QS_SHOW_VIEW = "quick_qs_show_view";
 
         /**
+         * Monet accurate shade
+         * @hide
+         */
+        public static final String MONET_ACCURATE_SHADE = "monet_accurate_shade";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *

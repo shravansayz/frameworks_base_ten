@@ -36,6 +36,10 @@ import static com.android.systemui.theme.ThemeOverlayApplier.OVERLAY_SECONDARY_C
 import static com.android.systemui.theme.ThemeOverlayApplier.OVERLAY_COLOR_INDEX;
 import static com.android.systemui.theme.ThemeOverlayApplier.OVERLAY_COLOR_SOURCE;
 import static com.android.systemui.theme.ThemeOverlayApplier.TIMESTAMP_FIELD;
+import static com.android.systemui.tenx.utils.TenXUtils.MONET_ACCURATE_SHADE_ANDROID;
+import static com.android.systemui.tenx.utils.TenXUtils.MONET_ACCURATE_SHADE_SYSUI;
+import static com.android.systemui.tenx.utils.TenXUtils.getMonetAccurateShadeSetting;
+import static com.android.systemui.tenx.utils.TenXUtils.setMonetAccurateShade;
 
 import android.app.ActivityManager;
 import android.app.UiModeManager;
@@ -1029,6 +1033,27 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                             mDeferredThemeEvaluation = true;
                             return;
                         }
+                        reevaluateSystemTheme(true /* forceReload */);
+                    }
+                },
+                UserHandle.USER_ALL);
+
+        boolean isMonetAccurateShade = getMonetAccurateShadeSetting(mContext);
+        setMonetAccurateShade(isMonetAccurateShade);
+        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_ANDROID, isMonetAccurateShade);
+        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SYSUI, isMonetAccurateShade);
+        mSystemSettings.registerContentObserverForUser(
+                Settings.System.getUriFor(Settings.System.MONET_ACCURATE_SHADE),
+                false,
+                new ContentObserver(mBgHandler) {
+                    @Override
+                    public void onChange(boolean selfChange, Collection<Uri> collection, int flags,
+                            int userId) {
+                        boolean isMonetAccurateShade = getMonetAccurateShadeSetting(mContext);
+                        setMonetAccurateShade(isMonetAccurateShade);
+                        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_ANDROID, isMonetAccurateShade);
+                        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SYSUI, isMonetAccurateShade);
+
                         reevaluateSystemTheme(true /* forceReload */);
                     }
                 },

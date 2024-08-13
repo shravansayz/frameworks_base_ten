@@ -25,4 +25,8 @@
 
     <!-- Data usage Panel -->
     <color name="data_usage_panel_color">@*android:color/system_neutral2_10</color>
+
+    <!-- monet accurate shade -->
+    <color name="monet_accurate_shade_overlay">?attr/shadeActive</color>
+    <color name="monet_accurate_shade_system">@android:color/system_accent1_500</color>
 </resources>
