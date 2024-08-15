@@ -38,6 +38,7 @@ import static com.android.systemui.theme.ThemeOverlayApplier.OVERLAY_COLOR_SOURC
 import static com.android.systemui.theme.ThemeOverlayApplier.TIMESTAMP_FIELD;
 import static com.android.systemui.tenx.utils.TenXUtils.MONET_ACCURATE_SHADE_ANDROID;
 import static com.android.systemui.tenx.utils.TenXUtils.MONET_ACCURATE_SHADE_SYSUI;
+import static com.android.systemui.tenx.utils.TenXUtils.MONET_ACCURATE_SHADE_SETTINGS;
 import static com.android.systemui.tenx.utils.TenXUtils.getMonetAccurateShadeSetting;
 import static com.android.systemui.tenx.utils.TenXUtils.setMonetAccurateShade;
 
@@ -1042,6 +1043,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
         setMonetAccurateShade(isMonetAccurateShade);
         mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_ANDROID, isMonetAccurateShade);
         mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SYSUI, isMonetAccurateShade);
+        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SETTINGS, isMonetAccurateShade);
         mSystemSettings.registerContentObserverForUser(
                 Settings.System.getUriFor(Settings.System.MONET_ACCURATE_SHADE),
                 false,
@@ -1053,6 +1055,7 @@ public class ThemeOverlayController implements CoreStartable, Dumpable {
                         setMonetAccurateShade(isMonetAccurateShade);
                         mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_ANDROID, isMonetAccurateShade);
                         mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SYSUI, isMonetAccurateShade);
+                        mThemeManager.enableOverlay(MONET_ACCURATE_SHADE_SETTINGS, isMonetAccurateShade);
 
                         reevaluateSystemTheme(true /* forceReload */);
                     }

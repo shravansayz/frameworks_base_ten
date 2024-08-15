@@ -24,6 +24,7 @@ public class TenXUtils {
     public static final String MONET_ACCURATE_SHADE = Settings.System.MONET_ACCURATE_SHADE;
     public static final String MONET_ACCURATE_SHADE_ANDROID = "com.android.monet.accurate_shade_android";
     public static final String MONET_ACCURATE_SHADE_SYSUI = "com.android.systemui.monet.accurate_shade_systemui";
+    public static final String MONET_ACCURATE_SHADE_SETTINGS = "com.android.systemui.monet.accurate_shade_settings";
 
     private static boolean mIsMonetAccurateShadeEnabled;
 
