@@ -329,6 +329,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
     private final NotificationListContainer mNotifListContainer;
     private final boolean mIsShortcutListSearchEnabled;
 
+    private boolean mChargingAnimation;
+
     private final KeyguardStateController.Callback mKeyguardStateControllerCallback =
             new KeyguardStateController.Callback() {
                 @Override
@@ -1813,6 +1815,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LOCKSCREEN_CHARGING_ANIMATION),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -1823,12 +1828,24 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_MATERIAL_DISMISS_ICON_STYLE))) {
                 updateDismissButtonIconStyle(mDismissAllButton);
+            } else if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.LOCKSCREEN_CHARGING_ANIMATION))) {
+                updateChargingAnimation();
             }
         }
 
         public void update() {
             updateDismissButtonBackgroundStyle(mDismissAllButton);
             updateDismissButtonIconStyle(mDismissAllButton);
+            updateChargingAnimation();
+        }
+    }
+
+    private void updateChargingAnimation() {
+        mChargingAnimation = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.LOCKSCREEN_CHARGING_ANIMATION, 1, UserHandle.USER_CURRENT) == 1;
+        if (mKeyguardIndicationController != null) {
+            mKeyguardIndicationController.updateChargingIndication(mChargingAnimation);
         }
     }
 

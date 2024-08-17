@@ -83,6 +83,8 @@ import android.view.accessibility.AccessibilityManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.app.IBatteryStats;
 import com.android.internal.widget.LockPatternUtils;
@@ -166,6 +168,7 @@ public class KeyguardIndicationController {
     private ViewGroup mIndicationArea;
     private KeyguardIndicationTextView mTopIndicationView;
     private KeyguardIndicationTextView mLockScreenIndicationView;
+    private LottieAnimationView mChargingIndicationView;
     private final IBatteryStats mBatteryInfo;
     private final SettableWakeLock mWakeLock;
     private final DockManager mDockManager;
@@ -202,6 +205,7 @@ public class KeyguardIndicationController {
     private boolean mPowerPluggedInWired;
     private boolean mPowerPluggedInWireless;
     private boolean mPowerPluggedInDock;
+    private boolean mChargingIndication = true;
 
     private boolean mPowerCharged;
     private boolean mBatteryDefender;
@@ -405,6 +409,8 @@ public class KeyguardIndicationController {
             R.id.keyguard_indication_text_bottom);
         mInitialTextColorState = mTopIndicationView != null
                 ? mTopIndicationView.getTextColors() : ColorStateList.valueOf(Color.WHITE);
+        mChargingIndicationView = (LottieAnimationView) indicationArea.findViewById(
+                R.id.charging_indication);
         if (mRotateTextViewController != null) {
             mRotateTextViewController.destroy();
         }
@@ -434,6 +440,8 @@ public class KeyguardIndicationController {
             collectFlow(mIndicationArea, mKeyguardInteractor.isActiveDreamLockscreenHosted(),
                     mIsActiveDreamLockscreenHostedCallback);
         }
+
+        updateChargingIndication();
     }
 
     /**
@@ -1060,6 +1068,7 @@ public class KeyguardIndicationController {
             } else if (mPowerPluggedIn || mEnableBatteryDefender) {
                 newIndication = computePowerIndication();
                 setWakelock = animate;
+                updateChargingIndication();
             } else {
                 newIndication = NumberFormat.getPercentInstance()
                         .format(mBatteryLevel / 100f);
@@ -1097,6 +1106,30 @@ public class KeyguardIndicationController {
         mTopIndicationView.setText(null);
         mLockScreenIndicationView.setVisibility(View.VISIBLE);
         updateLockScreenIndications(animate, getCurrentUser());
+        updateChargingIndication();
+    }
+
+    public void updateChargingIndication(boolean visible) {
+        mChargingIndication = visible;
+    }
+
+    private void updateChargingIndication() {
+        if (mChargingIndicationView == null) return;
+        if (mChargingIndication && mPowerPluggedIn) {
+            mChargingIndicationView.setVisibility(View.VISIBLE);
+            mChargingIndicationView.playAnimation();
+            ViewGroup.MarginLayoutParams params =
+                    (ViewGroup.MarginLayoutParams) mChargingIndicationView.getLayoutParams();
+            int marginBottom = mContext.getResources().getDimensionPixelSize(
+                    R.dimen.keyguard_charging_indication_margin_bottom);
+            if (mDozing) {
+                params.setMargins(0, 0, 0, 0);
+            } else {
+                params.setMargins(0, 0, 0, marginBottom);
+            }
+        } else {
+            mChargingIndicationView.setVisibility(View.GONE);
+        }
     }
 
     /**
