@@ -118,7 +118,7 @@ import com.android.systemui.plugins.FalsingManager;
 import com.android.systemui.plugins.statusbar.StatusBarStateController;
 import com.android.systemui.res.R;
 import com.android.systemui.settings.UserTracker;
-import com.android.systemui.statusbar.phone.FaceUnlockImageView;
+import com.android.systemui.statusbar.phone.FaceUnlockIndicatorView;
 import com.android.systemui.statusbar.phone.KeyguardBypassController;
 import com.android.systemui.statusbar.phone.KeyguardIndicationTextView;
 import com.android.systemui.statusbar.phone.StatusBarKeyguardViewManager;
@@ -172,7 +172,7 @@ public class KeyguardIndicationController {
     private final UserTracker mUserTracker;
     private final BouncerMessageInteractor mBouncerMessageInteractor;
     private ViewGroup mIndicationArea;
-    private FaceUnlockImageView mFaceIconView;
+    private FaceUnlockIndicatorView mFaceIconView;
     private KeyguardIndicationTextView mTopIndicationView;
     private KeyguardIndicationTextView mLockScreenIndicationView;
     private LottieAnimationView mChargingIndicationView;
@@ -279,7 +279,7 @@ public class KeyguardIndicationController {
             if (mFaceDetectionRunning) {
                 mFaceDetectionRunning = false;
                 mBiometricErrorMessageToShowOnScreenOn = null;
-                hideFaceUnlockRecognizingMessage();
+                updateFaceIconViewState(FaceUnlockIndicatorView.State.HIDDEN);
             }
         }
     };
@@ -371,9 +371,9 @@ public class KeyguardIndicationController {
                     mBiometricErrorMessageToShowOnScreenOn = null;
                 } else if (msg.what == MSG_SHOW_RECOGNIZING_FACE) {
                     mBiometricErrorMessageToShowOnScreenOn = null;
-                    showFaceUnlockRecognizingMessage();
+                    updateFaceIconViewState(FaceUnlockIndicatorView.State.SCANNING);
                 } else if (msg.what == MSG_HIDE_RECOGNIZING_FACE) {
-                    hideFaceUnlockRecognizingMessage();
+                    updateFaceIconViewState(FaceUnlockIndicatorView.State.HIDDEN);
                 }
             }
         };
@@ -1015,14 +1015,6 @@ public class KeyguardIndicationController {
             return;
         }
 
-        if (TextUtils.equals(biometricMessage, mContext.getString(R.string.keyguard_face_successful_unlock))) {
-            updateFaceIconViewState(FaceUnlockImageView.State.SUCCESS);
-        } else if (TextUtils.equals(biometricMessage, mContext.getString(R.string.keyguard_face_failed))) {
-            updateFaceIconViewState(FaceUnlockImageView.State.NOT_VERIFIED);
-        } else if (TextUtils.equals(biometricMessage, mContext.getString(R.string.face_unlock_recognizing))) {
-           updateFaceIconViewState(FaceUnlockImageView.State.SCANNING);
-        }
-
         mBiometricMessage = biometricMessage;
         mBiometricMessageFollowUp = biometricMessageFollowUp;
         mBiometricMessageSource = biometricSourceType;
@@ -1045,25 +1037,6 @@ public class KeyguardIndicationController {
             mBiometricMessageSource = null;
             mHideBiometricMessageHandler.cancel();
             updateBiometricMessage();
-        }
-    }
-
-    private void showFaceUnlockRecognizingMessage() {
-        String faceUnlockMessage = mContext.getResources().getString(
-            R.string.face_unlock_recognizing);
-        showBiometricMessage(faceUnlockMessage, FACE);
-    }
-
-    private void hideFaceUnlockRecognizingMessage() {
-        if (mFaceIconView != null) {
-            mFaceIconView.setVisibility(View.GONE);
-        }
-        String faceUnlockMessage = mContext.getResources().getString(
-            R.string.face_unlock_recognizing);
-        if (mBiometricMessage != null && mBiometricMessage.equals(faceUnlockMessage)) {
-            mBiometricMessage = null;
-            hideBiometricMessage();
-            updateFaceIconViewState(FaceUnlockImageView.State.HIDDEN);
         }
     }
 
@@ -1600,11 +1573,7 @@ public class KeyguardIndicationController {
                             biometricSourceType
                     );
                 } else if (faceAuthFailed && isUnlockWithFingerprintPossible) {
-                    showBiometricMessage(
-                            mContext.getString(R.string.keyguard_face_failed),
-                            mContext.getString(R.string.keyguard_suggest_fingerprint),
-                            biometricSourceType
-                    );
+                    updateFaceIconViewState(FaceUnlockIndicatorView.State.NOT_VERIFIED);
                 } else if (fpAuthFailed
                         && mKeyguardUpdateMonitor.isCurrentUserUnlockedWithFace()) {
                     // face had already previously unlocked the device, so instead of showing a
@@ -1899,13 +1868,13 @@ public class KeyguardIndicationController {
 
             if (mDozing) {
                 hideBiometricMessage();
-                hideFaceUnlockRecognizingMessage();
+                updateFaceIconViewState(FaceUnlockIndicatorView.State.HIDDEN);
             }
             updateDeviceEntryIndication(false);
         }
     };
 
-    private void updateFaceIconViewState(FaceUnlockImageView.State state) {
+    private void updateFaceIconViewState(FaceUnlockIndicatorView.State state) {
         if (mFaceIconView != null) {
             mFaceIconView.setState(state);
         }
