@@ -49,8 +49,6 @@ import com.android.systemui.qs.TouchAnimator.Builder;
 
 import com.bosphere.fadingedgelayout.FadingEdgeLayout;
 
-import lineageos.providers.LineageSettings;
-
 import java.lang.Math;
 
 /**
@@ -357,8 +355,8 @@ public class QuickStatusBarHeader extends FrameLayout
         mShowView = Settings.System.getIntForUser(getContext().getContentResolver(),
                 Settings.System.QUICK_QS_SHOW_VIEW, 0,
                 UserHandle.USER_CURRENT) == 1;
-        boolean isBlackMode = LineageSettings.Secure.getIntForUser(getContext().getContentResolver(),
-                LineageSettings.Secure.BERRY_BLACK_THEME, 0,
+        boolean isQsDualTone = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.QS_DUAL_TONE, 1,
                 UserHandle.USER_CURRENT) == 1;
 
         mQuickQsPanelSettings.setVisibility(mShowSettings ? View.VISIBLE : View.GONE);
@@ -367,11 +365,11 @@ public class QuickStatusBarHeader extends FrameLayout
 
         RelativeLayout.LayoutParams qqsDividerParams = (RelativeLayout.LayoutParams) mQuickQsPanelDivider.getLayoutParams();
 
-        if (qqsDividerParams != null ) {
-            if (mShowSettings && mShowTenXText && mShowView && !isBlackMode) {
+        if (qqsDividerParams != null) {
+            if (mShowSettings && isQsDualTone) {
                 mQuickQsPanelDivider.setVisibility(View.VISIBLE);
-                qqsDividerParams.addRule(RelativeLayout.BELOW, R.id.quick_qs_panel_background_view);
-            } else if (mShowSettings && mShowTenXText && !isBlackMode) {
+                qqsDividerParams.addRule(RelativeLayout.BELOW, mShowTenXText || mShowView ? R.id.quick_qs_panel_background_view : R.id.quick_qs_panel_items);
+            } else if ((mShowTenXText || mShowView) && isQsDualTone) {
                 mQuickQsPanelDivider.setVisibility(View.VISIBLE);
                 qqsDividerParams.addRule(RelativeLayout.BELOW, R.id.quick_qs_panel_items);
             } else {
