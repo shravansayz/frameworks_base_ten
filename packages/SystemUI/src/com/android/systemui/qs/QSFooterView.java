@@ -278,17 +278,17 @@ public class QSFooterView extends FrameLayout {
         TextView gpuBusy = findViewById(R.id.gpu_busy);
 
         String sysBatTemp = context.getResources().getString(
-                R.string.config_sysBatteryTemp);
+                com.android.internal.R.string.config_sysBatteryTemp);
         String sysCPUTemp = context.getResources().getString(
-                R.string.config_sysCPUTemp);
+                com.android.internal.R.string.config_sysCPUTemp);
         String sysGPULoad = context.getResources().getString(
-                R.string.config_sysGPULoad);
+                com.android.internal.R.string.config_sysGPULoad);
         String sysGPUFreq = context.getResources().getString(
-                R.string.config_sysGPUFreq);
+                com.android.internal.R.string.config_sysGPUFreq);
         int sysCPUTempMultiplier = context.getResources().getInteger(
-                R.integer.config_sysCPUTempMultiplier);
+                com.android.internal.R.integer.config_sysCPUTempMultiplier);
         int sysBatTempMultiplier = context.getResources().getInteger(
-                R.integer.config_sysBatteryTempMultiplier);
+                com.android.internal.R.integer.config_sysBatteryTempMultiplier);
         int defaultMultiplier = 1;
 
         String batteryTempText = SystemInfoUtils.getSystemInfo(sysBatTemp, sysBatTempMultiplier, " ℃", true);
