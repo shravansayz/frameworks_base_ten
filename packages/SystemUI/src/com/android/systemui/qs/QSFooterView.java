@@ -293,8 +293,8 @@ public class QSFooterView extends FrameLayout {
 
         String batteryTempText = SystemInfoUtils.getSystemInfo(sysBatTemp, sysBatTempMultiplier, " ℃", true);
         String cpuTemperatureText = SystemInfoUtils.getSystemInfo(sysCPUTemp, sysCPUTempMultiplier, " ℃", true);
-        String gpuClockText = SystemInfoUtils.getSystemInfo(sysGPULoad, defaultMultiplier, " MHz", true);
-        String gpuBusyText = SystemInfoUtils.getSystemInfo(sysGPUFreq, defaultMultiplier, "", false);
+        String gpuClockText = SystemInfoUtils.getSystemInfo(sysGPUFreq, defaultMultiplier, " MHz", true);
+        String gpuBusyText = SystemInfoUtils.getSystemInfo(sysGPULoad, defaultMultiplier, "", false);
 
         if (batteryTempText != null) {
             batteryTemp.setText(batteryTempText);
