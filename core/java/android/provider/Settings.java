@@ -13317,6 +13317,12 @@ public final class Settings {
         public static final String AMBIENT_MUSIC_TICKER = "ambient_music_ticker";
 
         /**
+         * Music ticker icon type
+         * @hide
+         */
+        public static final String AMBIENT_MUSIC_TICKER_ICON = "ambient_music_ticker_icon";
+
+        /**
          * Whether to enable DOZE only when charging
          * @hide
          */

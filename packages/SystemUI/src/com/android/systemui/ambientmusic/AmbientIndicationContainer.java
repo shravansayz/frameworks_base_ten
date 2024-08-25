@@ -17,6 +17,8 @@ package com.android.systemui.ambientmusic;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.media.MediaMetadata;
 import android.media.session.PlaybackState;
 import android.net.Uri;
@@ -47,6 +49,7 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
         NotificationMediaManager.MediaListener {
 
     private View mAmbientIndication;
+    private ImageView mAmbientIndicationIcon;
     private boolean mDozing;
     private boolean mKeyguard;
     private boolean mVisible;
@@ -59,6 +62,7 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
     private String mInfoToSet;
     private String mLastInfo;
     private int mAmbientMusicTicker;
+    private int mAmbientMusicTickerIcon;
 
     private CustomSettingsObserver mCustomSettingsObserver;
 
@@ -83,6 +87,7 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
         initializeMedia();
         mTrackInfoSeparator = getResources().getString(R.string.ambientmusic_songinfo);
         mAmbientMusicTicker = getAmbientMusicTickerStyle();
+        mAmbientMusicTickerIcon = getAmbientMusicTickerIconStyle();
     }
 
     private class CustomSettingsObserver extends ContentObserver {
@@ -95,6 +100,10 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
                     Settings.Secure.getUriFor(
                     Settings.Secure.AMBIENT_MUSIC_TICKER),
                     false, this, UserHandle.USER_ALL);
+            mContext.getContentResolver().registerContentObserver(
+                    Settings.Secure.getUriFor(
+                    Settings.Secure.AMBIENT_MUSIC_TICKER_ICON),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -102,6 +111,9 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
             if (uri.equals(Settings.Secure.getUriFor(
                     Settings.Secure.AMBIENT_MUSIC_TICKER))) {
                 mAmbientMusicTicker = getAmbientMusicTickerStyle();
+            } else if (uri.equals(Settings.Secure.getUriFor(
+                    Settings.Secure.AMBIENT_MUSIC_TICKER_ICON))) {
+                mAmbientMusicTickerIcon = getAmbientMusicTickerIconStyle();
             }
             update();
         }
@@ -114,6 +126,11 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
     private int getAmbientMusicTickerStyle() {
         return Settings.Secure.getIntForUser(mContext.getContentResolver(),
                     Settings.Secure.AMBIENT_MUSIC_TICKER, 1, UserHandle.USER_CURRENT);
+    }
+
+    private int getAmbientMusicTickerIconStyle() {
+        return Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                    Settings.Secure.AMBIENT_MUSIC_TICKER_ICON, 0, UserHandle.USER_CURRENT);
     }
 
     private void hideIndication() {
@@ -137,6 +154,7 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
 
     public void updateAmbientIndicationView(View view) {
         mAmbientIndication = findViewById(R.id.ambient_indication);
+        mAmbientIndicationIcon = findViewById(R.id.ambient_indication_icon);
         mText = (TextView)findViewById(R.id.ambient_indication_text);
         if (getAmbientMusicTickerStyle() == 1) {
             boolean nowPlayingAvailable = mMediaManager.getNowPlayingTrack() != null;
@@ -242,8 +260,29 @@ public class AmbientIndicationContainer extends AutoReinflateContainer implement
         if (mInfoToSet != null) {
             mText.setText(mInfoToSet);
             setVisibility(shouldShow());
+            updateNoteIcons();
         } else {
             hideIndication();
+        }
+    }
+
+    private void updateNoteIcons() {
+        Icon appIcon = mMediaManager.getMediaIcon();
+        Drawable appIconDrawable = null;
+        if (appIcon != null) {
+            appIconDrawable = appIcon.loadDrawable(mContext);
+        }
+
+        switch (getAmbientMusicTickerIconStyle()) {
+            case 0: // Default icon
+            default:
+                mAmbientIndicationIcon.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_music_note_24dp));
+                break;
+            case 1: // App icon
+                if (appIconDrawable != null) {
+                    mAmbientIndicationIcon.setImageDrawable(appIconDrawable);
+                    break;
+                }
         }
     }
 
