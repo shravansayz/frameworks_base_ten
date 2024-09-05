@@ -141,6 +141,9 @@ public class ThemeOverlayApplier implements Dumpable {
     @VisibleForTesting
     static final String OVERLAY_CATEGORY_LOCK_CLOCK_FONT =
             "android.theme.customization.lockscreen_clock_font";
+    @VisibleForTesting
+    static final String OVERLAY_CATEGORY_PROGRESS_BAR =
+            "android.theme.customization.progress_bar";
 
     /*
      * All theme customization categories used by the system, in order that they should be applied,
@@ -161,7 +164,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ACCURATE_SHADE_SYSUI,
             OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS,
             OVERLAY_CATEGORY_NAVBAR,
-            OVERLAY_CATEGORY_LOCK_CLOCK_FONT);
+            OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
+            OVERLAY_CATEGORY_PROGRESS_BAR);
 
     /* Categories that need to be applied to the current user as well as the system user. */
     @VisibleForTesting
@@ -177,7 +181,8 @@ public class ThemeOverlayApplier implements Dumpable {
             OVERLAY_CATEGORY_ACCURATE_SHADE_SYSUI,
             OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS,
             OVERLAY_CATEGORY_NAVBAR,
-            OVERLAY_CATEGORY_LOCK_CLOCK_FONT);
+            OVERLAY_CATEGORY_LOCK_CLOCK_FONT,
+            OVERLAY_CATEGORY_PROGRESS_BAR);
 
     /* Allowed overlay categories for each target package. */
     private final Map<String, Set<String>> mTargetPackageToCategories = new ArrayMap<>();
@@ -224,6 +229,7 @@ public class ThemeOverlayApplier implements Dumpable {
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_ACCURATE_SHADE_SETTINGS, SETTINGS_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_NAVBAR, SYSUI_PACKAGE);
         mCategoryToTargetPackage.put(OVERLAY_CATEGORY_LOCK_CLOCK_FONT, ANDROID_PACKAGE);
+        mCategoryToTargetPackage.put(OVERLAY_CATEGORY_PROGRESS_BAR, ANDROID_PACKAGE);
 
         dumpManager.registerDumpable(TAG, this);
     }
