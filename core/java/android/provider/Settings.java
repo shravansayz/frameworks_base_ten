@@ -7354,6 +7354,66 @@ public final class Settings {
         public static final String VOLUME_SLIDER_HAPTICS_INTENSITY = "volume_slider_haptics_intensity";
 
         /**
+         * Settings TenX dashboard enabled
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_ENABLED = "settings_tenx_dashboard_enabled";
+
+        /**
+         * Settings TenX dashboard background's
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_BACKGROUND = "settings_tenx_dashboard_background";
+
+        /**
+         * Settings TenX dashboard background blur
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_BACKGROUND_BLUR = "settings_tenx_dashboard_background_blur";
+
+        /**
+         * Settings TenX dashboard custom name
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_CUSTOM_NAME = "settings_tenx_dashboard_custom_name";
+
+        /**
+         * Settings TenX dashboard Random summary
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_SUMMARY_TYPE = "settings_tenx_dashboard_summary_type";
+
+        /**
+         * Settings TenX dashboard data usage
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_DATA_USAGE = "settings_tenx_dashboard_data_usage";
+
+        /**
+         * Settings TenX dashboard Battery status
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_BATTERY_BAR = "settings_tenx_dashboard_battery_bar";
+
+        /**
+         * Settings TenX dashboard round image radius
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_ROUND_IMAGE_RADIUS = "settings_tenx_dashboard_round_image_radius";
+
+        /**
+         * Settings TenX dashboard image alpha
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_IMAGE_ALPHA = "settings_tenx_dashboard_image_alpha";
+
+        /**
+         * Settings TenX dashboard weather type
+         * @hide
+         */
+        public static final String SETTINGS_TENX_DASHBOARD_WEATHER_TYPE = "settings_tenx_dashboard_weather_type";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
