@@ -134,6 +134,11 @@ class PulseLightView @JvmOverloads constructor(
             Settings.Secure.PULSE_AMBIENT_LIGHT_LAYOUT, 0,
             UserHandle.USER_CURRENT
         )
+        val directionIsRestart = Settings.Secure.getIntForUser(
+            context.contentResolver,
+            Settings.Secure.PULSE_AMBIENT_LIGHT_REPEAT_DIRECTION, 0,
+            UserHandle.USER_CURRENT
+        ) != 1
         val color = getLightColor(notificationPackageName)
         val leftView = requireViewById<ImageView>(R.id.animation_left)
         val rightView = requireViewById<ImageView>(R.id.animation_right)
@@ -160,7 +165,7 @@ class PulseLightView @JvmOverloads constructor(
         lightAnimator = ValueAnimator.ofFloat(*floatArrayOf(0.0f, 2.0f)).apply {
             duration = lightDuration
             repeatCount = repeat
-            repeatMode = ValueAnimator.RESTART
+            repeatMode = if (directionIsRestart) ValueAnimator.RESTART else ValueAnimator.REVERSE
             addListener(this@PulseLightView)
             addUpdateListener { animation ->
                 // onAnimationStart() is being called before waking screen in ambient mode.
