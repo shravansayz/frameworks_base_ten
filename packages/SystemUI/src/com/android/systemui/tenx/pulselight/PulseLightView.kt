@@ -129,9 +129,30 @@ class PulseLightView @JvmOverloads constructor(
             Settings.Secure.PULSE_AMBIENT_LIGHT_WIDTH, 125,
             UserHandle.USER_CURRENT
         )
+        val pulseAmbientLayout = Settings.Secure.getIntForUser(
+            context.contentResolver,
+            Settings.Secure.PULSE_AMBIENT_LIGHT_LAYOUT, 0,
+            UserHandle.USER_CURRENT
+        )
         val color = getLightColor(notificationPackageName)
         val leftView = requireViewById<ImageView>(R.id.animation_left)
         val rightView = requireViewById<ImageView>(R.id.animation_right)
+        leftView.adjustViewBounds = true
+        leftView.scaleType = ImageView.ScaleType.FIT_XY
+
+        rightView.adjustViewBounds = true
+        rightView.scaleType = ImageView.ScaleType.FIT_XY
+
+        when (pulseAmbientLayout) {
+            1 -> {
+                leftView.setImageResource(R.drawable.aod_notification_light_left_solid)
+                rightView.setImageResource(R.drawable.aod_notification_light_right_solid)
+            }
+            else -> {
+                leftView.setImageResource(R.drawable.aod_notification_light_left)
+                rightView.setImageResource(R.drawable.aod_notification_light_right)
+            }
+        }
         leftView.setColorFilter(color)
         rightView.setColorFilter(color)
         leftView.layoutParams.width = width

@@ -85,6 +85,8 @@ class PulseLightNotifManager @Inject constructor(
         val pulseAmbientLightRepeatCount =
                 Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_REPEAT_COUNT)
         val pulseAmbientLightFaceDown = Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_FACE_DOWN)
+        val pulseAmbientLightLayout = 
+                Settings.Secure.getUriFor(PULSE_AMBIENT_LIGHT_LAYOUT)
         val contentObserver = object: ContentObserver(null) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 when (uri) {
@@ -118,10 +120,13 @@ class PulseLightNotifManager @Inject constructor(
                 pulseAmbientLightRepeatCount, false, contentObserver, UserHandle.USER_CURRENT)
         context.contentResolver.registerContentObserver(
                 pulseAmbientLightFaceDown, false, contentObserver, UserHandle.USER_CURRENT)
+        context.contentResolver.registerContentObserver(
+                pulseAmbientLightLayout, false, contentObserver, UserHandle.USER_CURRENT)
         contentObserver.onChange(true, pulseAmbientLight)
         contentObserver.onChange(true, pulseAmbientLightDuration)
         contentObserver.onChange(true, pulseAmbientLightRepeatCount)
         contentObserver.onChange(true, pulseAmbientLightFaceDown)
+        contentObserver.onChange(true, pulseAmbientLightLayout)
     }
 
     private fun setupFaceDownDetector() {
@@ -198,6 +203,8 @@ class PulseLightNotifManager @Inject constructor(
                 Settings.Secure.PULSE_AMBIENT_LIGHT_REPEAT_COUNT
         private const val PULSE_AMBIENT_LIGHT_FACE_DOWN =
                 Settings.Secure.PULSE_AMBIENT_LIGHT_FACE_DOWN
+        private const val PULSE_AMBIENT_LIGHT_LAYOUT =
+                Settings.Secure.PULSE_AMBIENT_LIGHT_LAYOUT
     }
 
 }
